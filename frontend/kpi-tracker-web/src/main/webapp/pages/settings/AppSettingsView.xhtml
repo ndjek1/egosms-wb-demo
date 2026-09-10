@@ -1,0 +1,204 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/pages/californiatemplate/template.xhtml">
+
+	<ui:define name="title">PPMS Application Settings</ui:define>
+	<ui:define name="viewname">PPMS Application Settings</ui:define>
+
+	<ui:define name="content">
+		<h:form id="systemSettingView" prependId="false">
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<ui:fragment id="systemSettingViewSearch"
+						rendered="#{(componentRenderer.administrator)}">
+						<div class="card p-shadow-1" style="height: 70px;">
+							<div class="ui-g-12" style="display: flex;">
+								<!-- For max field -->
+								<p:inputNumber id="max" value="#{systemSettingView.max}"
+									style="margin-left: 5px" placeholder="MAX" size="15"
+									onkeypress="#{systemSettingView.reloadFilterReset()}"
+									symbol=" UGX/HRS MAX" maxlength="4" symbolPosition="s"
+									padControl="false" thousandSeparator="," required="true" />
+								<!-- For min field -->
+								<p:inputNumber id="min" value="#{systemSettingView.min}"
+									style="margin-left: 1px" placeholder="MIN" size="15"
+									onkeypress="#{systemSettingView.reloadFilterReset()}"
+									symbol=" UGX/HRS MIN" symbolPosition="s" padControl="false"
+									thousandSeparator="," required="true" />
+								<!-- For Statuses -->
+								<p:selectOneMenu id="systemSettingViewStatus"
+									value="#{systemSettingView.orgRateStatus}"
+									style="margin-left: 5px; width: 15%">
+									<f:selectItem itemLabel="--Select Status--" itemValue="#{null}" />
+									<f:selectItems var="orgRateStatus"
+										itemLabel="#{orgRateStatus}"
+										value="#{systemSettingView.orgRateStatuses}" required="true" />
+								</p:selectOneMenu>
+								
+								<p:commandButton id="searchBtn" update="systemSettingViewTable"
+									icon="fa fa-search" style="margin-left: 5px;" title="Search"
+									styleClass="ui-button ui-button-success"
+									actionListener="#{systemSettingView.reloadFilterReset()}" />
+
+								<p:commandButton icon="fa fa-plus" styleClass="ui-button-info"
+									style="margin-left: 5px"
+									oncomplete="PF('systemSettingView_dialog').show()" title="New"
+									validateClient="true" update="systemSettingViewForm"
+									actionListener="#{systemSettingView.loadSelectedSystemSetting(null)}">
+								</p:commandButton>
+
+							</div>
+						</div>
+					</ui:fragment>
+
+					<div class="p-shadow-2">
+						<p:dataTable id="systemSettingViewTable" var="model"
+							value="#{systemSettingView}" widgetVar="systemSettingViewTable"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+							paginator="true" lazy="true"
+							rows="#{systemSettingView.maximumresultsPerpage}"
+							emptyMessage="#{systemSettingView.dataEmptyMessage}"
+							paginatorPosition="bottom" paginatorAlwaysVisible="false"
+							rowIndexVar="row" reflow="true" styleClass="TableAlignment"
+							style="">
+
+							<f:facet name="header">
+								<div class="p-d-flex p-jc-between">
+									<div></div>
+									<div>
+										<span style="font-weight: bold">#{systemSettingView.totalRecords}
+											Record(s) found</span>
+									</div>
+									<div>
+										<p:commandButton value="Export" process="systemSettingViewTable"
+											style="margin-left: 10px;" icon="fa fa-download" ajax="false"
+											styleClass="ui-button ui-button-help">
+
+											<p:dataExporter type="pdf" target="systemSettingViewTable"
+												fileName="system-settings" />
+										</p:commandButton>
+									</div>
+								</div>
+							</f:facet>
+
+							<p:column width="30" headerText="No.">
+								<h:outputText value="#{row + 1}" />
+							</p:column>
+
+							<p:column headerText="Organisation Rate/Hr">
+								<h:outputText value="#{model.orgRatePerHr}"
+									style="float:right">
+									<f:convertNumber groupingUsed="true" />
+								</h:outputText>
+							</p:column>
+
+							<p:column headerText="Start Date">
+								<h:outputText value="#{model.startDate}">
+									<f:convertDateTime pattern="dd MMM, yyyy" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="End Date">
+								<h:outputText value="#{model.endDate}" >
+									<f:convertDateTime pattern="dd MMM, yyyy" />
+								</h:outputText>
+							</p:column>
+							
+							<p:column headerText="Status" style="text-align: center">
+								<p:commandButton type="button" value="#{model.orgRateStatus}"
+									styleClass="ui-button-outlined ui-button-warning" />
+							</p:column>
+
+							<p:column headerText="Action" exportable="false"
+								rendered="#{(componentRenderer.administrator)}"
+								style="text-align: center">
+
+								<p:commandButton icon="fa fa-edit" title="Edit"
+									styleClass="ui-button ui-button-info" process="@this"
+									actionListener="#{systemSettingView.loadSelectedSystemSetting(model)}"
+									oncomplete="PF('systemSettingView_dialog').show()"
+									update="systemSettingViewForm">
+
+								</p:commandButton>
+
+								<p:commandButton icon="fa fa-trash" title="Delete"
+									immediate="true" styleClass="ui-button ui-button-danger"
+									style="margin-left: 5px"
+									action="#{systemSettingView.delete(model)}" process="@this"
+									update="systemSettingViewTable">
+									<p:confirm header="Confirmation"
+										message="You are about to delete this rate. Do you wish to continue?"
+										icon="fa fa-exclamation-triangle" />
+								</p:commandButton>
+							</p:column>
+
+						</p:dataTable>
+
+						<p:blockUI block="systemSettingView" trigger="searchBtn">
+							<p:graphicImage value="/resources/images/workingicon.png" />
+						</p:blockUI>
+					</div>
+					<p:dialog widgetVar="systemSettingView_dialog" height="250px"
+						width="500px" header="Organisation Rate Form" minHeight="40"
+						showEffect="fade" modal="true">
+						<p:outputPanel id="systemSettingViewForm" styleClass="ui-fluid">
+							<p:outputPanel
+								rendered="#{systemSettingView.selectedSystemSetting!=null}">
+								
+								<div class="p-field">
+									<p:outputLabel for="orgRatePerHr">Organisation's Rate per Hour</p:outputLabel>
+									<p:inputNumber id="orgRatePerHr" required="true" 
+											value="#{systemSettingView.selectedSystemSetting.orgRatePerHr}"
+											styleClass="Wid100"
+											symbol=" UGX/HRS" symbolPosition="s" padControl="false"
+											thousandSeparator="," />
+								</div>
+
+								<div class="p-field">
+									<p:outputLabel for="orgRateStatus">Status</p:outputLabel>
+									<p:selectOneMenu id="orgRateStatus" styleClass="Wid100"
+										value="#{systemSettingView.selectedSystemSetting.orgRateStatus}">
+										<f:selectItems value="#{systemSettingView.orgRateStatuses}"
+											required="true" />
+									</p:selectOneMenu>
+								</div>
+								
+								<div class="p-formgrid p-grid">
+									<div class="p-field p-col-6"></div>
+									<div class="p-field p-col">
+										<p:commandButton value="Save" icon="fa fa-save"
+											styleClass="ui-button ui-button-info"
+											actionListener="#{systemSettingView.saveSelectedSystemSetting()}"
+											update="systemSettingViewTable" validateClient="true"
+											process="systemSettingViewForm @this" />
+									</div>
+									<div class="p-field p-col">
+										<p:commandButton value="Cancel" icon="fa fa-times"
+											styleClass="ui-button ui-button-danger"
+											process="systemSettingViewForm @this" validateClient="false"
+											oncomplete="PF('systemSettingView_dialog').hide()" />
+									</div>
+								</div>
+							</p:outputPanel>
+						</p:outputPanel>
+					</p:dialog>
+				</div>
+			</div>
+
+			<p:confirmDialog global="true">
+				<p:commandButton value="Yes" type="button"
+					styleClass="ui-confirmdialog-yes ui-button ui-button-info"
+					icon="fa fa-thumbs-up" />
+				<p:commandButton value="No" type="button"
+					styleClass="ui-confirmdialog-no ui-button ui-button-"
+					icon="fa fa-thumbs-down" />
+			</p:confirmDialog>
+
+		</h:form>
+
+	</ui:define>
+
+</ui:composition>

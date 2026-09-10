@@ -1,0 +1,10 @@
+$primaryColor:#fe875d !default;
+$primaryLightColor: scale-color($primaryColor, $lightness: 60%) !default;
+$primaryDarkColor:#E26134 !default;
+$primaryDarkerColor:#B34621 !default;
+$primaryTextColor:#ffffff !default;
+
+$highlightBg: scale-color($primaryColor, $lightness: 80%) !default;
+$highlightTextColor: #495057 !default;
+
+@import '../sass/theme/_theme';

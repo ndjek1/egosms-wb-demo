@@ -1,0 +1,217 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g ui-fluid">
+            <div class="ui-g-12">
+                <h:form id="usersView" enctype="multipart/form-data">
+
+                    <div class="p-grid overlay-demo">
+                        <div class="p-col-12 p-md-3">
+                            <div class="card">
+                                <h:outputText value="Total" />
+                                <h2 class="p-text-right">#{usersView.total}</h2>
+                            </div>
+                        </div>
+                        <div class="p-col-12 p-md-3">
+                            <div class="card">
+                                <h:outputText value="Male" />
+                                <h2 class="p-text-right">#{usersView.noMale}</h2>
+                            </div>
+                        </div>
+                        <div class="p-col-12 p-md-3">
+                            <div class="card">
+                                <h:outputText value="Female" />
+                                <h2 class="p-text-right">#{usersView.noFemale}</h2>
+                            </div>
+                        </div>
+                        <div class="p-col-12 p-md-3">
+                            <div class="card">
+                                <h:outputText value="UnKnown" />
+                                <h2 class="p-text-right">#{usersView.noUnknown}</h2>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card">
+                        <h:outputText value="Filters" />
+                        <p:growl id="messages" showDetail="true" />
+                        <div class="p-grid">
+                            <div class="p-col-12 p-md-6 p-lg-2">
+                                <p:inputText id="searchTerm" required="false"
+                                             value="#{usersView.searchTerm}" placeholder="Search ..."
+                                             onkeyup="#{staffView.reloadFilterReset()}">
+
+                                    <p:ajax event="keyup"
+                                            update="usersView"
+                                            listener="#{usersView.reloadFilterReset()}" />
+                                </p:inputText>
+                            </div>
+
+                            <div class="p-col-12 p-md-6 p-lg-3">
+                                <p:selectOneMenu id="genders" label="Filter gender"
+                                                 title="Filter gender" value="#{usersView.selectedGender}"
+                                                 style="height: 100%" converter="genderConverter">
+                                    <f:selectItem itemLabel="All" value="#{null}" />
+                                    <f:selectItems value="#{usersView.genders}" />
+                                    <p:ajax event="change" update="usersView"
+                                            listener="#{usersView.reloadFilterReset()}" />
+                                </p:selectOneMenu>
+                            </div>
+                            <div class="p-col-12 p-md-6 p-lg-3">
+                                <p:calendar placeholder="From Date Created"
+                                            value="#{usersView.createdFrom}" inputStyleClass="Wid100 "
+                                            navigator="true" pattern="dd MMM, yyyy" />
+                            </div>
+                            <div class="p-col-12 p-md-6 p-lg-3">
+                                <p:calendar placeholder="To Date Created"
+                                            value="#{usersView.createdTo}" inputStyleClass="Wid100 "
+                                            navigator="true" pattern="dd MMM, yyyy" />
+                            </div>
+                            <div class="p-col-12 p-md-6 p-lg-1">
+                                <p:commandButton icon="fa fa-search"
+                                                 styleClass="ui-button-success" id="searchBtn"
+                                                 style="margin-right: 18px" update="usersView"
+                                                 actionListener="#{usersView.reloadFilterReset()}">
+                                </p:commandButton>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                    <ui:fragment>
+                        <div class="p-grid table-demo">
+                            <div class="p-col-12">
+                                <div class="card">
+                                    <p:dataTable id="usersTable" var="model" value="#{usersView.dataModels}"
+                                                 widgetVar="usersTable"
+                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                                 paginator="true" lazy="true" rows="20"
+                                                 emptyMessage="#{usersView.dataEmptyMessage}"
+                                                 paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                                                 rowIndexVar="row" reflow="true" styleClass="TableAlgnment">
+
+                                        <f:facet name="header">
+                                            <div class="p-d-flex p-jc-between">
+                                                <div>
+                                                    <span class="table-header-text">System users</span>
+
+                                                </div>
+
+                                                <div>
+                                                    <div class="p-d-flex p-flex-wrap">
+                                                        <div class="p-mr-2 p-mb-2">
+                                                            <p:commandButton value="Add user" process="@this"
+                                                                             styleClass="ui-button-help" immediate="true"
+                                                                             actionListener="#{userFormDialog.show}">
+                                                                <f:setPropertyActionListener value="#{null}"
+                                                                                             target="#{userFormDialog.model}" />
+
+                                                                <p:ajax event="dialogReturn" listener="#{usersView.reloadFilterReset}" update="usersTable" />
+                                                            </p:commandButton>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </f:facet>
+
+                                        <p:column width="30" headerText="No.">
+                                            <h:outputText value="#{row + 1}" />
+                                        </p:column>
+                                        <p:column exportable="false">
+                                            <f:facet name="header">
+                                                <h:outputText value="Image" />
+                                            </f:facet>
+                                            <p:graphicImage id="imageView"
+                                                            styleClass="profile-image-small"
+                                                            value="#{ model.customPropOne!=null?model.customPropOne:'resources/california-layout/images/default-profile-image.png'}" />
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Full name" />
+                                            </f:facet>
+                                            <h:outputText value="#{model.fullName}" />
+                                        </p:column>
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="User name" />
+                                            </f:facet>
+                                            <h:outputText value="#{model.username}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Gender" />
+                                            </f:facet>
+                                            <h:outputText value="#{model.gender}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText value="Roles" />
+                                            </f:facet>
+                                            <h:outputText value="#{model.roles}" />
+                                        </p:column>
+
+                                        <p:column>
+                                            <f:facet name="header">
+                                                <h:outputText style="text-align: center" value="Created by" />
+                                            </f:facet>
+                                            <h:outputText value="#{model.createdBy}" />
+                                        </p:column>
+
+                                        <p:column headerText="Action" width="140" exportable="false"
+                                                  style="text-align: center">
+                                            <p:commandButton process="@this" icon="fa fa-edit"
+                                                             styleClass="ui-button-help" immediate="true" rendered="true"
+                                                             actionListener="#{userFormDialog.show}">
+                                                <f:setPropertyActionListener value="#{model}"
+                                                                             target="#{userFormDialog.model}" />
+                                                <p:ajax event="dialogReturn" update="usersTable" />
+                                            </p:commandButton>
+
+                                            <p:commandButton icon="fa fa-trash" title="Delete"
+                                                             styleClass="ui-button-danger"
+                                                             style="margin-left: 5px"
+                                                             actionListener="#{usersView.deleteSelectedUser(model)}"
+                                                             update="usersView">
+                                                <p:confirm header="Confirmation"
+                                                           message="You are about to delete a user. Do you wish to continue?"
+                                                           icon="ui-icon-alert" />
+                                            </p:commandButton>
+
+                                        </p:column>
+
+                                    </p:dataTable>
+
+                                    <p:blockUI block="usersView" trigger="searchBtn">
+                                        <p:graphicImage value="/resources/images/workingicon.png" />
+                                    </p:blockUI>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </ui:fragment>
+                    <p:blockUI block="usersView">
+                        <p:graphicImage value="/resources/images/workingicon.png" />
+                    </p:blockUI>
+                    <p:confirmDialog global="true">
+                        <p:commandButton value="Yes" type="button"
+                                         styleClass="ui-confirmdialog-yes" icon="fa fa-thumbs-up" />
+                        <p:commandButton value="No" type="button"
+                                         styleClass="ui-confirmdialog-no" icon="fa fa-thumbs-down" />
+                    </p:confirmDialog>
+
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

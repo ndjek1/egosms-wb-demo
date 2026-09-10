@@ -1,0 +1,32 @@
+$fontFamily:"Source Sans Pro",Arial,sans-serif !default;
+$fontSize:14px !default;
+$borderRadius:0 !default;
+$dividerColor:#d6d7d9 !default;
+$textColor:#212121 !default;
+$textSecondaryColor:#797979 !default;
+$transitionDuration:.3s !default;
+$mobileBreakPoint:1024px !default;
+$animationDuration:.4s !default;
+$animationTimingFunction:cubic-bezier(.05,.74,.2,.99) !default;
+$overlayBorder:0 none !default;
+$overlayShadow: 0 2px 4px -1px rgba(0,0,0,.2), 0 4px 5px 0 rgba(0,0,0,.14), 0 1px 10px 0 rgba(0,0,0,.12) !default;
+$tabletBreakpoint:991px !default;
+$phoneBreakpoint:576px !default;
+
+/*Badge*/
+$badgeBgColor:#4aa564 !default;
+$badgeTextColor:#ffffff !default;
+
+/* RouteBar */
+$routeBarBgColor:#ffffff !default;
+$routeBarBorderColor:#d6d7d9 !default;
+$routeBarIconColor:#5b616a !default;
+$routeBarIconHoverBgColor:#f1f1f1 !default;
+
+//accent
+$accentColor: #1976D2 !default;
+$accentTextColor: #ffffff !default;
+
+//sidebar right
+$rightSidebarWidth: 16rem !default;
+$rightSidebarBg: #ffffff !default;

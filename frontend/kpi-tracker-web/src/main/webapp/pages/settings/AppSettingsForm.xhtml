@@ -1,0 +1,60 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/pages/californiatemplate/template.xhtml">
+
+	<ui:define name="title">PPMS Application Settings</ui:define>
+	<ui:define name="viewname">PPMS Application Settings</ui:define>
+
+	<ui:define name="content">
+		<div class="ui-g ui-fluid">
+			<div class="ui-g-12">
+				<p:tabView dynamic="true" cache="true">
+					<p:tab title="Organisation Rate">
+						<h:form id="settingsForm"
+							rendered="#{ (componentRenderer.administrator) }">
+
+							<div class="card card-w-title">
+								<p:fieldset legend="Rate"
+									style="margin-bottom:20px; width:90%; ">
+									<p:panelGrid columns="1" layout="grid"
+										styleClass="ui-panelgrid-blank form-group">
+
+										<h:outputText value="Organisation's Rate per Hour:"
+											style="font-size: 18px;" />
+										<p:inputNumber required="true" size="15"
+											value="#{settingsForm.model.orgRatePerHr}"
+											style="padding: 10px; font-size: 20px; width:100%;"
+											symbol=" UGX/HRS" symbolPosition="s" padControl="false"
+											thousandSeparator="," />
+										<p:commandButton icon="fa fa-save" value="Save" id="saveBtn"
+											styleClass="ui-button-info" validateClient="true"
+											style=" margin-left: 50px; width: 100px;"
+											action="#{settingsForm.save}" update="settingsForm" />
+									</p:panelGrid>
+
+								</p:fieldset>
+
+
+							</div>
+							<p:blockUI block="settingsForm" trigger="saveBtn">
+								<p:graphicImage value="/resources/images/workingicon.png" />
+							</p:blockUI>
+						</h:form>
+					</p:tab>
+
+					<!-- <p:tab title="Global Settings">
+						<p class="p-m-0">PPMS Global Settings</p>
+					</p:tab>
+					
+					<p:tab title="Email Templates">
+						<p class="p-m-0">PPMS Email Templates</p>
+					</p:tab> -->
+				</p:tabView>
+			</div>
+
+		</div>
+	</ui:define>
+</ui:composition>

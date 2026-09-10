@@ -1,0 +1,58 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pc="http://primefaces.org/california">
+
+    <div
+            class="layout-sidebar #{guestPreferences.menuColor eq 'dark' ? 'layout-sidebar-dark' : ''} #{guestPreferences.menuColor eq 'gradient' ? 'layout-sidebar-dark layout-sidebar-gradient': ''}">
+        <div class="sidebar-scroll-content">
+            <h:form id="sidebarProfileForm">
+                <ui:fragment
+                        rendered="#{guestPreferences.profileMode == 'inline' ? true : false}">
+                    <div class="user-profile">
+                        <a id="sidebar-profile-button" href="#"> <p:graphicImage name="images/unnamed.png"
+                                                                                 style="width:80px; height: 80px;"
+                                                                                 library="california-layout"
+                                                                                 styleClass="profile-avatar"/>
+                            <span class="sidebar-profile-name">#{dashboard.loggedinUser.emailAddress}</span>
+                            <span class="sidebar-profile-role">#{dashboard.loggedinUser.username}</span>
+                        </a>
+                        <ul id="sidebar-usermenu" class="usermenu">
+                            <li><h:commandLink action="#{profileView.getViewPath}">
+                                <i class="pi pi-fw pi-user"/>
+                                <span class="topbar-item-name">Profile</span>
+                                <f:setPropertyActionListener target="#{profileView.model}"
+                                                             value="#{dashboard.loggedinUser}"/>
+                            </h:commandLink></li>
+                        </ul>
+                    </div>
+                </ui:fragment>
+            </h:form>
+            <h:form id="menuform">
+                <pc:menu widgetVar="CaliforniaMenuWidget">
+                    <p:menuitem id="dashboard" value="Dashboard"
+                                icon="pi pi-fw pi-home" outcome="/pages/dashboard/Dashboard"/>
+                    <p:submenu id="whatsapp" label="WhatsApp" icon="pi pi-fw pi-comments">
+                        <p:menuitem id="waAccounts" value="Connected Accounts" icon="pi pi-fw pi-link" outcome="/pages/whatsapp/ConnectedAccounts"/>
+                        <p:menuitem id="waTemplates" value="Templates" icon="pi pi-fw pi-file" outcome="/pages/whatsapp/Templates"/>
+                        <p:menuitem id="waSend" value="Send" icon="pi pi-fw pi-send" outcome="/pages/whatsapp/Send"/>
+                        <p:menuitem id="waConversations" value="Conversations" icon="pi pi-fw pi-inbox" outcome="/pages/whatsapp/Conversations"/>
+                    </p:submenu>
+                    <p:submenu id="settings" label="Settings" icon="pi pi-fw pi-cog">
+                        <p:menuitem id="users" value="Users" icon="pi pi-fw pi-users"
+                                    outcome="/pages/users/UsersView" />
+                        <p:menuitem id="roles" value="Roles" icon="fa fa-wrench"
+                                    outcome="/pages/users/RolesView"/>
+                        <p:menuitem id="demo" value="Demo" icon="fa fa-wrench"
+                                    outcome="/pages/registerUser/RegisterUser"/>
+                    </p:submenu>
+                    <p:menuitem id="logout" value="Logout" icon="fa fa-fw fa-sign-out"
+                                url="#{request.contextPath}/ServiceLogout"/>
+                </pc:menu>
+            </h:form>
+        </div>
+    </div>
+
+</ui:composition>

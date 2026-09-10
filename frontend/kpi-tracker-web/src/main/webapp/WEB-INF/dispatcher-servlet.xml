@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- It does the bean discovery (searches for @Component annotation in base 
+		package) and then activates the additional annotations (e.g. Autowired). -->
+	<!-- Controllers live in the DispatcherServlet child context. Services stay in
+	     the root context so their transaction proxies are not duplicated/lost. -->
+	<context:component-scan
+		base-package="org.pahappa.systems.egoSms.core.webControllers" />
+
+	<bean
+		class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		<property name="cacheSeconds" value="0" />
+		<property name="order" value="1" />
+		<property name="messageConverters">
+			<list>
+				<bean
+					class="org.springframework.http.converter.StringHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.FormHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+				<bean
+					class="org.springframework.http.converter.BufferedImageHttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- The ResourceBundleViewResolver is used to resolve the view names using 
+		view beans defined in the properties file. -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.ResourceBundleViewResolver">
+		<property name="basename" value="views" />
+		<property name="order" value="0" />
+	</bean>
+
+	<!-- The InternalResourceViewResolver is used to resolve the provided URI 
+		to actual URI. -->
+	<bean id="vwResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix">
+			<value>/WEB-INF/views/</value>
+		</property>
+		<property name="suffix">
+			<value>.jsp</value>
+		</property>
+		<property name="order" value="1" />
+	</bean>
+
+	<mvc:interceptors>
+		<bean name="openEntityManagerInViewInterceptor"
+			class="org.springframework.orm.jpa.support.OpenEntityManagerInViewInterceptor">
+			<property name="entityManagerFactory"
+				ref="entityManagerFactory" />
+		</bean>
+	</mvc:interceptors>
+
+</beans>

@@ -1,0 +1,65 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/dialog-template.xhtml">
+    <ui:define name="head">
+        <style type="text/css">
+            .capitalized {
+                text-transform: capitalize;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <title>Add user</title>
+        <h:form id="roleFormDialog" style="height: 450px" styleClass="card">
+            <div class="p-grid ui-fluid" style="display:flex">
+                <div class="p-col-12 p-md-6">
+                    <h5>Name</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{roleFormDialog.model.name}"
+                                     required="true" />
+                    </div>
+                </div>
+                <div class="p-col-12 p-md-6">
+                    <h5>Description</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{roleFormDialog.model.description}"
+                                     required="true" />
+                    </div>
+                </div>
+                <div class="p-field p-col-12 p-md-12">
+                    <h5>Permissions</h5>
+                    <div class="ui-inputgroup">
+                        <p:selectManyCheckbox id="permissionGrid"
+                                              value="#{roleFormDialog.selectedPermissionsList}"
+                                              converter="permissionConverter" layout="grid" columns="3"
+                                              styleClass="grid-checkbox">
+                            <f:selectItems value="#{roleFormDialog.permissionsList}"
+                                           var="permission" itemLabel="#{permission}"
+                                           itemValue="#{permission}" />
+                        </p:selectManyCheckbox>
+                    </div>
+                </div>
+                <div class="ui-col-12 ui-md-12" style="margin-top: 60px; align-self: flex-end !important;">
+                    <div class="p-grid p-justify-end">
+                        <div class="p-col-2">
+                            <p:commandButton value="Cancel" 
+                                             validateClient="false"
+                                             process="@this"
+                                             action="#{roleFormDialog.hide}"
+                                             styleClass="ui-button-outlined ui-button-help" />
+                        </div>
+                        <div class="p-col-2" >
+                            <p:commandButton value="Save" 
+                                             process="@form"
+                                             actionListener="#{roleFormDialog.save}"
+                                             update="@form" validateClient="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

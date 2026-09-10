@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.0.3.xsd">
+	<!-- WEB SECURITY CONFIGURATIONS -->
+	<bean id="filterChainProxy"
+		class="org.springframework.security.web.FilterChainProxy">
+		<security:filter-chain-map path-type="ant">
+			<security:filter-chain
+				pattern="/resources/california-layout/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/california-layout/css/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/california-layout/js/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/california-layout/images/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/california-layout/fonts/**" filters="none" />
+				
+			<security:filter-chain
+				pattern="/resources/custom-layout/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/custom-layout/css/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/custom-layout/js/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/custom-layout/images/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/custom-layout/fonts/**" filters="none" />
+
+			<security:filter-chain pattern="/favicon.ico"
+				filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/images/**" filters="none" />
+			<security:filter-chain
+				pattern="/ExternalViews/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/ExternalViews/Login.xhtml" filters="none" />
+
+			<security:filter-chain
+				pattern="/javax.faces.resource/**" filters="none" />
+
+			<security:filter-chain
+				pattern="/resources/images/**" filters="none" />
+				
+			<security:filter-chain
+				pattern="/resources/california-layout/images/favicon.ico" filters="none" />
+
+			<security:filter-chain pattern="/resources/**"
+				filters="none" />
+
+			<security:filter-chain pattern="/static/**"
+				filters="none" />
+
+			<security:filter-chain pattern="/ServiceLogin"
+				filters="none" />
+
+			<security:filter-chain
+				pattern="/ServiceLoginFailure" filters="none" />
+
+			<security:filter-chain pattern="/api/**"
+				filters="none" />
+			<security:filter-chain pattern="/whatsapp/webhooks"
+				filters="none" />
+			<security:filter-chain pattern="/whatsapp/webhooks/**"
+				filters="none" />
+			<security:filter-chain pattern="/**"
+				filters="
+	           securityContextPersistenceFilterWithASCTrue,
+	           logoutFilter,
+	           formLoginFilter,
+	           rememberMeFilter,
+	           exceptionTranslationFilter,
+	           filterSecurityInterceptor" />
+		</security:filter-chain-map>
+	</bean>
+	<!-- INCHARGE OF RESTRICTING WEB ACCESS TO RESOURCES -->
+	<bean id="filterSecurityInterceptor"
+		class="org.springframework.security.web.access.intercept.FilterSecurityInterceptor">
+		<property name="authenticationManager"
+			ref="authenticationManager" />
+		<property name="accessDecisionManager"
+			ref="accessDecisionManager" />
+		<property name="securityMetadataSource">
+			<security:filter-security-metadata-source>
+				<security:intercept-url pattern="/favicon.ico"
+					access="permitAll" />
+				<security:intercept-url pattern="/**"
+					access="perm_web_access" />
+				<security:intercept-url pattern="/pages/**"
+					access="isAuthenticated()" />
+			</security:filter-security-metadata-source>
+		</property>
+	</bean>
+	<!-- <bean id="logoutFilter" class="org.springframework.security.web.authentication.logout.LogoutFilter"> 
+		<constructor-arg value="/ServiceLogin" /> <constructor-arg> <list> <bean 
+		class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" 
+		/> </list> </constructor-arg> <property name="filterProcessesUrl" value="/ServiceLogout" 
+		/> </bean> -->
+
+	<bean id="logoutFilter"
+		class="org.springframework.security.web.authentication.logout.LogoutFilter">
+		<constructor-arg value="/ServiceLogin" />
+		<constructor-arg>
+			<list>
+				<!-- <ref bean="logoutEventBroadcaster" /> -->
+				<bean id="securityContextLogoutHandler"
+					class="org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler" />
+			</list>
+		</constructor-arg>
+		<property name="filterProcessesUrl" value="/ServiceLogout" />
+	</bean>
+
+	<!-- INCHARGE OF HANDLING EXCEPTIONS -->
+	<bean id="exceptionTranslationFilter"
+		class="org.springframework.security.web.access.ExceptionTranslationFilter">
+		<property name="authenticationEntryPoint"
+			ref="authenticationEntryPoint" />
+		<property name="accessDeniedHandler"
+			ref="accessDeniedHandler" />
+	</bean>
+
+	<bean id="authenticationEntryPoint"
+		class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+		<property name="loginFormUrl" value="/ServiceLogin" />
+	</bean>
+
+	<bean id="accessDeniedHandler"
+		class="org.springframework.security.web.access.AccessDeniedHandlerImpl">
+		<property name="errorPage" value="/error/accessDenied" />
+	</bean>
+
+	<!-- incharge of persisting the sessionContextHolder to and fro the http 
+		session -->
+	<bean id="securityContextPersistenceFilterWithASCTrue"
+		class="org.springframework.security.web.context.SecurityContextPersistenceFilter">
+		<property name='securityContextRepository'>
+			<bean
+				class='org.springframework.security.web.context.HttpSessionSecurityContextRepository'>
+				<property name='allowSessionCreation' value='true' />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="formLoginFilter"
+		class="org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter">
+		<property name="authenticationManager"
+			ref="authenticationManager" />
+		<property name="filterProcessesUrl"
+			value="/j_spring_security_check" />
+		<property name="authenticationFailureHandler">
+			<bean
+				class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
+				<property name="defaultFailureUrl"
+					value="/ServiceLoginFailure" />
+			</bean>
+		</property>
+		<property name="authenticationSuccessHandler">
+			<bean
+				class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
+				<!-- <property name="administratorTargetUrl" value="/administrator.html" 
+					/> -->
+			</bean>
+		</property>
+
+		<property name="rememberMeServices" ref="rememberMeServices" />
+	</bean>
+
+	<!-- REMEMBER ME SERVICES -->
+	<bean id="rememberMeFilter"
+		class="org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter">
+		<property name="rememberMeServices" ref="rememberMeServices" />
+		<property name="authenticationManager"
+			ref="authenticationManager" />
+	</bean>
+</beans>

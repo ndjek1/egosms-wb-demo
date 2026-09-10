@@ -1,0 +1,32 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <ul class="route-bar-menu">
+        <li class="search-item">
+            <i class="pi pi-search"/>
+            <input type="text" placeholder="Search..."/>
+        </li>
+        <li>
+            <a href="#" data-tooltip="Notifications">
+                <i class="pi pi-globe"/>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-tooltip="Calendar">
+                <i class="pi pi-calendar"/>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-tooltip="Help">
+                <i class="pi pi-question-circle"/>
+            </a>
+        </li>
+    </ul>
+
+    <p:tooltip globalSelector=".route-bar-menu a" position="bottom" showDelay="0"/>
+
+</ui:composition>

@@ -1,0 +1,71 @@
+$bodyBgColor:#f2f5fa !default;
+$topbarLeftBgColor:#3f4381 !default;
+$topbarRightBgColor:#3f4381 !default;
+$topbarIconHoverBgColor:rgba(255,255,255,.1) !default;
+$topbarTextColor:#ffffff !default;
+$sidebarBorderColor:#d6d7d9 !default;
+$footerBgColor:#1d1d1f !default;
+$statsTopBorderColor:#3f4381 !default;
+$teamContentHoverBorderColor:#3f4381 !default;
+
+$sidebarBgColor:#ffffff !default;
+$sidebarMenuitemTextColor:#212121 !default;
+$sidebarMenuitemDividerColor:rgba(0,0,0,.075) !default;
+$sidebarMenuitemIconColor:#5b616a !default;
+$sidebarMenuitemHoverBgColor:rgba(33,33,33,.3) !default;
+$sidebarMenuitemActiveBorderLeftColor:#3f4381 !default;
+$sidebarMenuitemActiveTextColor:#3f4381 !default;
+$sidebarMenuitemActiveIconColor:#3f4381 !default;
+$menuBgImage:'hollywood-light.png' !default;
+$horizontalMenuBgImageLight: 'hollywood-horizontal-light.png' !default;
+$horizontalMenuBgColor: #dedcdd !default;
+
+$darkSidebarBgColor:#1a1c1c !default;
+$darkSidebarMenuitemTextColor:#ffffff !default;
+$darkSidebarMenuitemDividerColor:rgba(255,255,255,.075) !default;
+$darkSidebarMenuitemIconColor:#ffffff !default;
+$darkSidebarMenuitemHoverBgColor:rgba(255,255,255,.1) !default;
+$darkSidebarMenuItemHoverTextColor:#d8a816 !default;
+$darkSidebarMenuitemActiveBorderLeftColor:#d8a816 !default;
+$darkSidebarMenuitemActiveTextColor:#d8a816 !default;
+$darkSidebarMenuitemActiveIconColor:#d8a816 !default;
+$darkMenuBgImage:'hollywood-dark.png' !default;
+$horizontalMenuBgImageDark: 'hollywood-horizontal-dark.png' !default;
+$horizontalDarkMenuBgColor: #252d2c !default;
+
+$gradientSidebarTopBgColor:#3f4381 !default;
+$gradientSidebarBottomBgColor:#202352 !default;
+$gradientSidebarMenuitemTextColor:#ffffff !default;
+$gradientSidebarMenuitemDividerColor:rgba(255,255,255,.075) !default;
+$gradientSidebarMenuitemIconColor:#ffffff !default;
+$gradientSidebarMenuitemHoverBgColor:rgba(255,255,255,.1) !default;
+$gradientSidebarMenuItemHoverTextColor:#2fafa4 !default;
+$gradientSidebarMenuitemActiveBorderLeftColor:#2fafa4 !default;
+$gradientSidebarMenuitemActiveTextColor:#2fafa4 !default;
+$gradientSidebarMenuitemActiveIconColor:#2fafa4 !default;
+$gradientMenuBgImage:'hollywood-gradient.png' !default;
+$horizontalMenuBgImageGradient: 'hollywood-horizontal-gradient.png' !default;
+$horizontalGradientMenuBgColor: #697479 !default;
+
+$megamenuButtonTextColor:#ffffff !default;
+$megamenuBgColor:#ffffff !default;
+$megamenuBorderColor:#d6d7d9 !default;
+$megamenuTextColor:#5b616a !default;
+$megamenuHeaderColor:#202352 !default;
+$megamenuIconColor:#5b616a !default;
+$megamenuHoverBgColor:#f1f1f1 !default;
+$megamenuActiveTextColor:#4f54a6 !default;
+$megamenuMobileBgColor:#2d3168 !default;
+$megamenuMobileHoverBgColor:#202352 !default;
+
+$darkMegamenuBgColor:#1d1d1f !default;
+$darkMegamenuTextColor:#ffffff !default;
+$darkMegamenuHeaderShadowColor:#000000 !default;
+$darkMegamenuIconColor:#ffffff !default;
+$darkMegamenuHoverBgColor:rgba(255,255,255,.1) !default;
+$darkMegamenuHoverTextColor:#d8a816 !default;
+
+$gradientMegamenuTopBgColor:#3f4381 !default;
+$gradientMegamenuBottomBgColor:#202352 !default;
+
+@import '../../sass/layout/_layout';

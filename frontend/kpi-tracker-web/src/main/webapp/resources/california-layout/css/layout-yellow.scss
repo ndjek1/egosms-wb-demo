@@ -1,0 +1,62 @@
+$bodyBgColor:#f2f5fa !default;
+$topbarLeftBgColor:#FDB81E !default;
+$topbarRightBgColor:#FDB81E !default;
+$topbarIconHoverBgColor:#EAA200 !default;
+$topbarTextColor:#ffffff !default;
+$sidebarBorderColor:#d6d7d9 !default;
+$footerBgColor:#242725 !default;
+$statsTopBorderColor:#FDB81E !default;
+$teamContentHoverBorderColor:#FDB81E !default;
+
+$sidebarBgColor:#ffffff !default;
+$sidebarMenuitemTextColor:#212121 !default;
+$sidebarMenuitemDividerColor:#e4e2e0 !default;
+$sidebarMenuitemIconColor:#5b616a !default;
+$sidebarMenuitemHoverBgColor:#f1f1f1 !default;
+$sidebarMenuitemActiveBorderLeftColor:#E0A113 !default;
+$sidebarMenuitemActiveTextColor:#E0A113 !default;
+$sidebarMenuitemActiveIconColor:#E0A113 !default;
+
+$darkSidebarBgColor:#242725 !default;
+$darkSidebarMenuitemTextColor:#ffffff !default;
+$darkSidebarMenuitemDividerColor:rgba(255,255,255,.075) !default;
+$darkSidebarMenuitemIconColor:#ffffff !default;
+$darkSidebarMenuitemHoverBgColor:rgba(255,255,255,.1) !default;
+$darkSidebarMenuItemHoverTextColor:#F9C642 !default;
+$darkSidebarMenuitemActiveBorderLeftColor:#F9C642 !default;
+$darkSidebarMenuitemActiveTextColor:#F9C642 !default;
+$darkSidebarMenuitemActiveIconColor:#F9C642 !default;
+
+$gradientSidebarTopBgColor:#242725 !default;
+$gradientSidebarBottomBgColor:#6B4C07 !default;
+$gradientSidebarMenuitemTextColor:#ffffff !default;
+$gradientSidebarMenuitemDividerColor:rgba(255,255,255,.075) !default;
+$gradientSidebarMenuitemIconColor:#ffffff !default;
+$gradientSidebarMenuitemHoverBgColor:rgba(255,255,255,.1) !default;
+$gradientSidebarMenuItemHoverTextColor:#F9C642 !default;
+$gradientSidebarMenuitemActiveBorderLeftColor:#F9C642 !default;
+$gradientSidebarMenuitemActiveTextColor:#F9C642 !default;
+$gradientSidebarMenuitemActiveIconColor:#F9C642 !default;
+
+$megamenuButtonTextColor:#ffffff !default;
+$megamenuBgColor:#ffffff !default;
+$megamenuBorderColor:#d6d7d9 !default;
+$megamenuTextColor:#5b616a !default;
+$megamenuHeaderColor:#272724 !default;
+$megamenuIconColor:#5b616a !default;
+$megamenuHoverBgColor:#f1f1f1 !default;
+$megamenuActiveTextColor:#F9C642 !default;
+$megamenuMobileBgColor:#E0A113 !default;
+$megamenuMobileHoverBgColor:#CA9112 !default;
+
+$darkMegamenuBgColor:#272724 !default;
+$darkMegamenuTextColor:#ffffff !default;
+$darkMegamenuHeaderShadowColor:#000000 !default;
+$darkMegamenuIconColor:#ffffff !default;
+$darkMegamenuHoverBgColor:rgba(255,255,255,.1) !default;
+$darkMegamenuHoverTextColor:#F9C642 !default;
+
+$gradientMegamenuTopBgColor:#242725 !default;
+$gradientMegamenuBottomBgColor:#6B4C07 !default;
+
+@import '../../sass/layout/_layout';

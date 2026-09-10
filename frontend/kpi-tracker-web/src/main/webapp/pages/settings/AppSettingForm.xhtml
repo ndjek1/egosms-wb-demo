@@ -1,0 +1,169 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                 template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g ui-fluid">
+            <div class="ui-g-12">
+                <ui:fragment rendered="#{!akmsRenderer.administrator}">
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-g-12">
+                            <div class="exception-topbar">
+                                <h:link styleClass="logo">
+                                    <p:graphicImage library="freya-layout" />
+                                </h:link>
+                            </div>
+
+                            <div class="exception-panel">
+                                <h1 class="exception-summary">Access Denied</h1>
+                                <p class="exception-detail">
+                                    You don't have the necessary permissions.<br></br> Contact the
+                                    administrator for more information.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </ui:fragment>
+
+                <h:form id="appSettingForm"
+                        rendered="#{ (akmsRenderer.administrator) }">
+
+                    <div class="card card-w-title" >
+
+                        <h4>Adjust system settings</h4>
+
+
+                    </div>
+
+                    <div class="card card-w-title" >
+                        
+                        <p:tabView >
+                            <p:tab  title="System settings">
+                                <div class="p-grid ">
+                                    <div class="p-col-12 p-md-12 p-lg-6">
+
+                                        <h:outputLabel for="@next" style="font-size: 18px;"  value="System name"/>
+
+                                        <p:inputText required="true"
+                                                     value="#{appSettingForm.model.systemName}" 
+                                                     maxlength="20" />
+
+                                    </div>
+
+                                    <div class="p-col-12 p-md-12 p-lg-6">
+
+                                        <h:outputLabel for="@next" style="font-size: 18px;"  value="Company name"/>
+                                        <div class="ui-inputgroup">
+                                            <p:inputText required="true"
+                                                         value="#{appSettingForm.model.organisationName}" 
+                                                         maxlength="20" />
+                                        </div>
+                                    </div>
+
+                                    <div class="p-col-12 p-md-12 p-lg-6">
+
+                                        <h:outputLabel for="@next" style="font-size: 18px;"  value="Company physical address"/>
+
+                                        <p:inputText required="true"
+                                                     value="#{appSettingForm.model.organisationPhysicalAddress}" 
+                                                     maxlength="100"/>
+
+                                    </div>
+                                    <div class="p-col-12 p-md-12 p-lg-6">
+                                        <h:outputLabel for="@next" style="font-size: 18px;"  value="Default VAT"/>
+
+                                        <p:inputNumber required="true"
+                                                       value="#{appSettingForm.model.vatRate}"  maxlength="20" />
+
+                                    </div>
+                                </div>
+                            </p:tab>
+                           
+                        </p:tabView>
+                        <div class="p-grid p-justify-end">
+                            <div class="p-col-2">
+                                <p:commandButton icon="fa fa-save" value="Save" id="saveBtn2"
+                                                 styleClass="primary-button" validateClient="true"
+                                                 action="#{appSettingForm.save}"
+                                                 update="appSettingForm" />
+                            </div>
+
+                            <div class="p-col-2">
+                                <p:button value="Back" styleClass="help-button"
+                                          icon="fa fa-backward" 
+                                          outcome="#{appSettingForm.parentView}" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <p:dialog id="systemLogoDialogue" height="300px" width="60%" 
+                              header="Update system logo" 
+                              widgetVar="systemLogoDialogue" minHeight="40"   showEffect="fade" modal="true">
+                        <p:outputPanel rendered="#{appSettingForm.model!=null}">
+                            <div class="p-grid ui-fluid ">
+                                <p:growl id="message2" showDetail="true"/>
+                                <div class="p-col-12 p-md-12 p-d-flex p-jc-center" >
+                                    <p:graphicImage id="systemLogoView2" cache="false"
+                                                    value="#{not empty appSettingForm.model.systemLogoLink?appSettingForm.model.systemLogoLink:'/resources/images/default-logo.png'}" 
+                                                    />
+                                </div>
+                                <div class="p-col-12 p-md-12">
+
+                                    <p:fileUpload 
+                                        multiple="false"
+                                        style="width: 100%"
+
+                                        sizeLimit="3145728" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+                                        invalidSizeMessage="Maximum file size allowed is 3 MB"
+                                        invalidFileMessage="only gif | jpg | jpeg | png is allowed"
+                                        update="appSettingForm"
+
+                                        fileUploadListener="#{appSettingForm.companyLogoUploadEvent}"/>
+
+                                </div>
+                            </div>
+                        </p:outputPanel>
+                    </p:dialog>
+                    <p:dialog id="documentLogoDialogue" height="300px" width="60%" 
+                              header="Update documemnts logo" 
+                              widgetVar="documentLogoDialogue" minHeight="40"   showEffect="fade" modal="true">
+                        <p:outputPanel rendered="#{appSettingForm.model!=null}">
+                            <div class="p-grid ui-fluid ">
+                                <p:growl id="messages" showDetail="true"/>
+                                <div class="p-col-12 p-md-12 p-d-flex p-jc-center" >
+                                    <p:graphicImage id="dialogueImageView" cache="false"
+                                                    value="#{not empty appSettingForm.model.systemLogoLink?appSettingForm.model.systemLogoLink:'/resources/images/default-logo.png'}" 
+                                                    />
+                                </div>
+                                <div class="p-col-12 p-md-12">
+
+                                    <p:fileUpload 
+                                        multiple="false"
+                                        style="width: 100%"
+
+                                        sizeLimit="3145728" allowTypes="/(\.|\/)(gif|jpe?g|png)$/"
+                                        invalidSizeMessage="Maximum file size allowed is 3 MB"
+                                        invalidFileMessage="only gif | jpg | jpeg | png is allowed"
+                                        update="dialogueImageView imageView"
+
+                                        fileUploadListener="#{appSettingForm.companyLogoUploadEvent}"/>
+
+                                </div>
+                            </div>
+                        </p:outputPanel>
+                    </p:dialog>
+
+                    <p:blockUI block="appSettingForm" trigger="saveBtn2">
+                        <p:graphicImage value="/resources/images/workingicon.png" />
+                    </p:blockUI>
+
+                </h:form>
+            </div>
+
+        </div>
+    </ui:define>
+</ui:composition>

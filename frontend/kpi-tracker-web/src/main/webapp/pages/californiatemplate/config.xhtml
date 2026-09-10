@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <a tabindex="0" id="layout-config-button" class="layout-config-button">
+        <i class="pi pi-cog"/>
+    </a>
+
+    <div class="layout-config">
+        <h5>Menu Type</h5>
+        <h:form id="config-form">
+            <p:selectOneRadio value="#{guestPreferences.menuLayout}" layout="pageDirection" onchange="PrimeFaces.CaliforniaConfigurator.changeMenuMode(event.target.value)">
+                <f:selectItem itemLabel="Static" itemValue="static"/>
+                <f:selectItem itemLabel="Overlay" itemValue="layout-wrapper-overlay-sidebar"/>
+                <f:selectItem itemLabel="Horizontal" itemValue="layout-wrapper-horizontal-sidebar"/>
+                <f:selectItem itemLabel="Slim" itemValue="layout-wrapper-slim-sidebar"/>
+                <p:ajax update="config-form :topbarProfileForm :sidebarProfileForm" />
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Menu Color</h5>
+            <p:selectOneRadio value="#{guestPreferences.menuColor}" layout="pageDirection" onchange="PrimeFaces.CaliforniaConfigurator.changeMenuColor(event.target.value)" >
+                <f:selectItem itemLabel="Light" itemValue="light"/>
+                <f:selectItem itemLabel="Dark" itemValue="dark"/>
+                <f:selectItem itemLabel="Gradient" itemValue="gradient"/>
+                <p:ajax update="config-form" />
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>MegaMenu Color</h5>
+            <p:selectOneRadio value="#{guestPreferences.megaMenuColor}" layout="pageDirection" onchange="PrimeFaces.CaliforniaConfigurator.changeMegaMenuColor(event.target.value)" >
+                <f:selectItem itemLabel="Light" itemValue="light"/>
+                <f:selectItem itemLabel="Dark" itemValue="dark"/>
+                <f:selectItem itemLabel="Gradient" itemValue="gradient"/>
+                <p:ajax update="config-form" />
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>User Menu Type</h5>
+            <p:selectOneRadio value="#{guestPreferences.profileMode}" layout="pageDirection">
+                <f:selectItem itemLabel="Inline" itemValue="inline" itemDisabled="#{guestPreferences.menuLayout eq 'layout-wrapper-horizontal-sidebar'}"/>
+                <f:selectItem itemLabel="Top" itemValue="topbar"/>
+                <p:ajax update=":topbarProfileForm :sidebarProfileForm" />
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Input Style</h5>
+            <p:selectOneRadio value="#{guestPreferences.inputStyle}" layout="pageDirection"
+                              onchange="PrimeFaces.CaliforniaConfigurator.updateInputStyle(event.target.value)">
+                <f:selectItem itemLabel="Outlined" itemValue="outlined"/>
+                <f:selectItem itemLabel="Filled" itemValue="filled"/>
+                <p:ajax/>
+            </p:selectOneRadio>
+
+            <hr/>
+
+            <h5>Special Themes</h5>
+            <div class="layout-themes">
+                <ui:repeat value="#{guestPreferences.specialThemes}" var="theme">
+                    <div>
+                        <p:commandLink actionListener="#{guestPreferences.setTheme(theme.file)}"
+                                       style="background-image: linear-gradient(to right,#{theme.color1},#{theme.color2})"
+                                       process="@this" update="config-form"
+                                       onstart="PrimeFaces.CaliforniaConfigurator.beforeResourceChange()"
+                                       oncomplete="PrimeFaces.CaliforniaConfigurator.changeScheme('#{theme.file}')">
+                            <ui:fragment rendered="#{not empty theme.image}">
+                                <p:graphicImage name="images/configurator/#{theme.image}.jpg"
+                                                library="california-layout" title="#{theme.name}" />
+                            </ui:fragment>
+                        </p:commandLink>
+                    </div>
+                </ui:repeat>
+            </div>
+
+            <hr/>
+
+            <h5>Solid Themes</h5>
+            <div class="layout-themes">
+                <ui:repeat value="#{guestPreferences.themes}" var="theme">
+                    <div>
+                        <p:commandLink actionListener="#{guestPreferences.setTheme(theme.file)}"
+                                       style="background-color: #{theme.color}" title="#{theme.name}" process="@this"
+                                       onstart="PrimeFaces.CaliforniaConfigurator.beforeResourceChange()"
+                                       update="config-form"
+                                       oncomplete="PrimeFaces.CaliforniaConfigurator.changeScheme('#{theme.file}')">
+                        </p:commandLink>
+                    </div>
+                </ui:repeat>
+            </div>
+        </h:form>
+    </div>
+</ui:composition>

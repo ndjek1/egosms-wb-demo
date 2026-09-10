@@ -1,0 +1,122 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="rolesView" enctype="multipart/form-data">
+            <div class="p-grid ">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        <div class="p-d-flex p-jc-between" style="margin: 5px">
+                            <div>
+                                <p:inputText id="searchTerm" required="false"
+                                             placeholder="Search for roles..."
+                                             onkeyup="#{rolesView.reloadFilterReset()}"
+                                             value="#{rolesView.searchTerm}">
+                                    <p:ajax event="keyup" update=":rolesView:rolesTable"
+                                            listener="#{rolesView.reloadFilterReset()}" />
+                                </p:inputText>
+                            </div>
+                            <div>
+                                <p:commandButton icon="fa fa-search"
+                                                 styleClass="p-mr-2 p-mb-2 primary-button" id="searchBtn"
+                                                 actionListener="#{rolesView.reloadFilterReset()}"
+                                                 update="rolesView" value="Search">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-grid ">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:dataTable id="rolesTable" var="model"
+                                     value="#{rolesView.dataModels}" widgetVar="rolesTable"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" lazy="true"
+                                     rows="#{rolesView.maximumresultsPerpage}"
+                                     emptyMessage="#{rolesView.dataEmptyMessage}"
+                                     paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                                     rowIndexVar="row" reflow="true" styleClass="TableAlgnment">
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-between">
+                                    <div>
+                                        <span style="font-weight: bold">Roles</span>
+                                    </div>
+                                    <div>
+                                        <p:commandButton value="Add Role" process="@this"
+                                                         styleClass="ui-button-help" immediate="true"
+                                                         actionListener="#{roleFormDialog.show}">
+                                            <f:setPropertyActionListener value="#{null}"
+                                                                         target="#{roleFormDialog.model}" />
+                                            <p:ajax event="dialogReturn" listener="#{rolesView.reloadFilterReset}" update="rolesTable" />
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </f:facet>
+                            <p:column width="30" headerText="No.">
+                                <h:outputText value="#{row + 1}" />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Name" />
+                                </f:facet>
+                                <h:outputText value="#{model.name}" />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Description" />
+                                </f:facet>
+                                <h:outputText value="#{model.description}" />
+                            </p:column>
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Permisions" />
+                                </f:facet>
+                                <h:outputText value="#{model.permissions.size()}" />
+                            </p:column>
+                            <p:column headerText="Action" exportable="false" width="150"
+                                      style="text-align: center">
+                                <p:commandButton icon="fa fa-edit" title="Edit role"
+                                                 styleClass="ui-button-help" immediate="true"
+                                                 actionListener="#{roleFormDialog.show}">
+                                    <f:setPropertyActionListener value="#{model}"
+                                                                 target="#{roleFormDialog.model}" />
+
+                                    <p:ajax event="dialogReturn" update="rolesTable" />
+                                </p:commandButton>
+
+                                <p:commandButton icon="fa fa-trash" title="Delete role"
+                                                 styleClass="ui-button-danger" style="margin-left: 5px"
+                                                 actionListener="#{rolesView.deleteSelectedRole(model)}" update="rolesView">
+                                    <p:confirm header="Confirmation"
+                                               message="You are about to delete a role. Do you wish to continue?"
+                                               icon="ui-icon-alert" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                        <p:blockUI block="rolesView" trigger="searchBtn">
+                            <p:graphicImage value="/resources/images/workingicon.png" />
+                        </p:blockUI>
+                    </div>
+                </div>
+            </div>
+
+            <p:blockUI block="rolesView">
+                <p:graphicImage value="/resources/images/workingicon.png" />
+            </p:blockUI>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button"
+                                 styleClass="ui-confirmdialog-yes" icon="fa fa-thumbs-up" />
+                <p:commandButton value="No" type="button"
+                                 styleClass="ui-confirmdialog-no" icon="fa fa-thumbs-down" />
+            </p:confirmDialog>
+        </h:form>
+    </ui:define>
+</ui:composition>

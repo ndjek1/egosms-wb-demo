@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <f:facet name="first">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+    </f:facet>
+    <title>Name MIS</title>
+</h:head>
+
+<div class="login-topbar">
+    <h:link outcome="/dashboard" styleClass="logo">
+        <p:graphicImage name="images/logo.png" library="california-layout"/>
+    </h:link>
+</div>
+<p:graphicImage styleClass="login-image" name="images/image-login.png" library="california-layout"/>
+
+<h:body styleClass="login-body #{guestPreferences.inputStyleClass}">
+    <h:form id="loginForm" prependId="false">
+        <div class="login-panel ui-fluid">
+            <div class="p-grid">
+                <div class="p-col-12 p-lg-12 p-md-12 logo-container">
+                    <span class="login-summary">Sign in to KPI Tracker System</span>
+                    <div class="login-detail">
+                        <span>Welcome, please use the form to sign-in network.</span>
+                    </div>
+                </div>
+                <div class="p-col-12 p-lg-12 p-md-12">
+                    <h:outputText value="Username"/>
+                    <p:inputText id="j_username" required="true"
+                                 placeholder="Enter username">
+                        <p:ajax update="j_username"/>
+                    </p:inputText>
+                </div>
+                <div class="p-col-12 p-lg-12 p-md-12">
+                    <h:outputText value="Password"/>
+                    <p:inputText id="j_password" required="true"
+                                 placeholder=" Enter Password" type="password">
+                        <p:ajax update="j_password"/>
+                    </p:inputText>
+                </div>
+                <div class="p-col-12 p-lg-12 p-md-12 chkbox-container">
+                    <p:selectBooleanCheckbox id="remember-me"/>
+                    <p:outputLabel for="remember-me" value="Remember Me"/>
+                    <a href="#">Reset Password</a>
+                </div>
+                <div class="p-col-12 p-lg-12 p-md-12 button-container" style="text-align: right">
+                    <p:commandButton id="login" value="Login" ajax="false"
+                                     styleClass="ui-button-raised ui-button-info"
+                                     validateClient="true" update="loginForm"
+                                     action="#{loginController.doLogin}"/>
+                </div>
+                <div class="p-col-12 p-lg-12 p-md-12 button-container" style="text-align: center">
+                </div>
+            </div>
+        </div>
+
+    </h:form>
+    <h:outputStylesheet name="css/primeicons.css" library="california-layout"/>
+    <h:outputStylesheet name="css/primeflex.min.css" library="california-layout"/>
+    <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="california-layout"/>
+</h:body>
+
+</html>

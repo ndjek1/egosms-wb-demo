@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/dialog-template.xhtml">
+    <ui:define name="head">
+        <style type="text/css">
+            .capitalized {
+                text-transform: capitalize;
+            }
+        </style>
+    </ui:define>
+    <ui:define name="content">
+        <title>Add user</title>
+        <h:form id="userFormDialog" style="height: 450px" styleClass="card">
+            <div class="p-grid ui-fluid" style="display:flex">
+                <div class="ui-col-12 ui-md-6">
+                    <h5>First name</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{userFormDialog.model.firstName}" required="true" />
+                    </div>
+                </div>
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Last name</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{userFormDialog.model.lastName}" required="true" />
+                    </div>
+                </div>
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Username</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{userFormDialog.model.username}" disabled="#{userFormDialog.edit}" required="true" />
+                    </div>
+                </div>
+
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Email</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{userFormDialog.model.emailAddress}" />
+                    </div>
+                </div>
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Gender</h5>
+                    <div class="ui-inputgroup">
+                        <p:selectOneMenu value="#{userFormDialog.model.gender}"
+                                         converter="genderConverter" filter="true"
+                                         required="true" effect="fold">
+                            <f:selectItem itemLabel="Select gender" itemValue="" />
+                            <f:selectItems value="#{userFormDialog.listOfGenders}" />
+                        </p:selectOneMenu>
+                    </div>
+                </div>
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Phone number</h5>
+                    <div class="ui-inputgroup">
+                        <p:inputText value="#{userFormDialog.model.phoneNumber}"  />
+                    </div>
+                </div>
+                <hr></hr>
+                <div class="ui-col-12 ui-md-12">
+                    <h5>Roles</h5>
+                    <div class="ui-inputgroup">
+                        <p:selectManyCheckbox id="rolesGrid" value="#{userFormDialog.userRoles}" 
+                                              converter="roleConverter" 
+                                              layout="grid" columns="3" >
+                            <f:selectItems value="#{userFormDialog.databaseRoles}" var="role" itemLabel="#{role}" itemValue="#{role}"/>
+                        </p:selectManyCheckbox>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Password</h5>
+                    <div class="ui-inputgroup">
+                        <p:password id="pwd1" value="#{userFormDialog.model.clearTextPassword}" match="pwd2" />
+                    </div>
+                </div>
+
+                <div class="ui-col-12 ui-md-6">
+                    <h5>Confirm Password</h5>
+                    <div class="ui-inputgroup">
+                        <p:password id="pwd2" value="#{userFormDialog.model.clearTextPassword}"  />
+                    </div>
+                </div>
+                <div class="ui-col-12 ui-md-12" style="margin-top: 60px; align-self: flex-end !important;">
+                    <div class="p-grid p-justify-end">
+                        <div class="p-col-2">
+                            <p:commandButton value="Cancel" 
+                                             validateClient="false"
+                                             process="@this"
+                                             action="#{userFormDialog.hide}"
+                                             styleClass="ui-button-outlined ui-button-help" />
+                        </div>
+                        <div class="p-col-2" >
+                            <p:commandButton value="Save" 
+                                             process="@form"
+                                             actionListener="#{userFormDialog.save}"
+                                             update="@form" validateClient="true" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

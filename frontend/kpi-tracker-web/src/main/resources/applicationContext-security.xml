@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util 
+			http://www.springframework.org/schema/util/spring-util-3.0.xsd 
+			http://www.springframework.org/schema/context 
+			http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+			http://www.springframework.org/schema/security 
+          	http://www.springframework.org/schema/security/spring-security-3.0.3.xsd">
+
+	<bean id="authenticationService"
+		class="org.sers.webutils.server.core.security.service.impl.CustomAuthenticationServiceImpl" />
+
+	<bean id="userDetailsService"
+		class="org.sers.webutils.server.core.security.service.impl.CustomUserDetailsServiceImpl" />
+
+	<bean id="authenticationProvider"
+		class="org.sers.webutils.server.core.security.authentication.CustomAuthenticationProvider" />
+
+	<bean name="accessDecisionManager"
+		class="org.springframework.security.access.vote.AffirmativeBased">
+		<property name="allowIfAllAbstainDecisions" value="false" />
+		<property name="decisionVoters">
+			<list>
+				<bean id="roleVoter"
+					class="org.springframework.security.access.vote.RoleVoter">
+					<property name="rolePrefix" value="" />
+				</bean>
+				<bean id="authenticatedVoter"
+					class="org.springframework.security.access.vote.AuthenticatedVoter" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- AUTHENTICATION MANAGER -->
+	<bean name="authenticationManager"
+		class="org.springframework.security.authentication.ProviderManager">
+		<property name="providers">
+			<list>
+				<ref bean="authenticationProvider" />
+				<ref bean="rememberMeAuthenticationProvider" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="methodDefinitionSourceAdvisor"
+		class="org.springframework.security.access.intercept.aopalliance.MethodSecurityMetadataSourceAdvisor"
+		autowire="constructor">
+		<constructor-arg value="methodSecurityInterceptor" />
+		<constructor-arg ref="securedAnnotationMetadataSource" />
+		<constructor-arg
+			value="securedAnnotationMetadataSource" />
+	</bean>
+
+	<bean id="securedAnnotationMetadataSource"
+		name="securedAnnotationMetadataSource"
+		class="org.springframework.security.access.annotation.SecuredAnnotationSecurityMetadataSource" />
+
+	<bean id="delegatingMethodSecurityMetadataSource"
+		class="org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource">
+		<property name="methodSecurityMetadataSources">
+			<list>
+				<bean
+					class="org.springframework.security.access.method.MapBasedMethodSecurityMetadataSource" />
+				<bean
+					class="org.springframework.security.access.annotation.SecuredAnnotationSecurityMetadataSource" />
+				<bean
+					class="org.springframework.security.access.annotation.Jsr250MethodSecurityMetadataSource" />
+			</list>
+		</property>
+	</bean>
+
+	<bean id="methodSecurityInterceptor"
+		class="org.springframework.security.access.intercept.aopalliance.MethodSecurityInterceptor">
+		<property name="validateConfigAttributes" value="false" />
+		<property name="authenticationManager"
+			ref="authenticationManager" />
+		<property name="accessDecisionManager"
+			ref="accessDecisionManager" />
+		<property name="securityMetadataSource"
+			ref="delegatingMethodSecurityMetadataSource" />
+	</bean>
+
+	<bean id="jdbcTokenRepository"
+		class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+		<property name="createTableOnStartup" value="false" />
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- REMEMBER ME SERVICES -->
+	<bean id="rememberMeServices"
+		class="org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices">
+		<property name="userDetailsService" ref="userDetailsService" />
+		<property name="tokenRepository" ref="jdbcTokenRepository" />
+		<property name="key" value="rememberMeServices" />
+		<property name="alwaysRemember" value="false" />
+		<property name="parameter"
+			value="_spring_security_remember_me" />
+	</bean>
+
+	<bean id="rememberMeAuthenticationProvider"
+		class="org.springframework.security.authentication.RememberMeAuthenticationProvider">
+		<property name="key" value="rememberMeServices" />
+	</bean>
+</beans>

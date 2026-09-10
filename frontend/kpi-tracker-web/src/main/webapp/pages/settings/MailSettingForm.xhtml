@@ -1,0 +1,77 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g ui-fluid">
+            <div class="ui-g-12">
+                <h:form id="mailSettingForm" rendered="#{ (akmsRenderer.administrator) }">
+                    
+
+                    <div class="card card-w-title">
+                        <p:fieldset legend="Mail Settings"
+                                    style="margin-bottom:20px; width:90%; ">
+                            <div class="ui-g">
+                                <div class="ui-g-6">
+                                    <h:outputText value="Sender Email address"
+                                                  style="font-size: 18px;" />
+                                    <p:inputText required="true"
+                                                 value="#{mailSettingForm.model.senderAddress}"
+                                                 placeholder="Enter sender email address"
+                                                 style="padding: 10px; font-size: 20px;  width:100%;" />
+                                </div>
+                                <div class="ui-g-6">
+                                    <h:outputText value="Sender Email password"
+                                                  style="font-size: 18px;" />
+                                    <p:password required="true" rendered="#{true}" 
+                                                value="#{mailSettingForm.model.senderPassword}"
+                                                style="padding: 10px; font-size: 20px;"
+                                                placeholder="Enter sender password" />
+                                </div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-6">
+                                    <h:outputText value="Email smtp host" style="font-size: 18px;" />
+                                    <p:inputText required="true"
+                                                 value="#{mailSettingForm.model.senderSmtpHost}"
+                                                 style="padding: 10px; font-size: 20px;"
+                                                 placeholder="Enter Email smtp host" />
+                                </div>
+                                <div class="ui-g-6">
+                                    <h:outputText value="Email smtp port" style="font-size: 18px;" />
+                                    <p:inputText required="true"
+                                                 value="#{mailSettingForm.model.senderSmtpPort}"
+                                                 style="padding: 10px; font-size: 20px;"
+                                                 placeholder="Enter Email smtp port" />
+                                </div>
+                            </div>
+                        </p:fieldset>
+
+                        <div class="ui-g">
+                            <div class="ui-g-1">
+                                <div style="text-align: center">
+                                    <p:commandButton icon="fa fa-save" value="Save" id="saveBtn"
+                                                     styleClass="green-btn" validateClient="true"
+                                                     style="margin-bottom:15px; " action="#{mailSettingForm.save}"
+                                                     update="@form" />
+                                </div>
+                            </div>
+                            <div class="ui-g-1">
+                                <p:button value="Back" styleClass="red-btn"
+                                          icon="fa fa-backward" 
+                                          outcome="#{mailSettingForm.parentView}" />
+                            </div>
+                        </div>
+                    </div>
+                    <p:blockUI block="mailSettingForm" trigger="saveBtn">
+                        <p:graphicImage value="/resources/images/workingicon.png" />
+                    </p:blockUI>
+                </h:form>
+            </div>
+
+        </div>
+    </ui:define>
+</ui:composition>

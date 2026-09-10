@@ -1,0 +1,110 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:pc="http://primefaces.org/california">
+
+    <h:form>
+        <div id="layout-megamenu"
+             class="p-col-12 layout-megamenu #{guestPreferences.megaMenuColor eq 'dark' ? 'layout-megamenu-dark' : ''} #{guestPreferences.megaMenuColor eq 'gradient' ? 'layout-megamenu-dark layout-megamenu-gradient' : ''}">
+            <div class="p-grid">
+                <div class="p-col-12 p-md-6 p-lg-3 layout-megamenu-submenu">
+                    <h6>System Reports</h6>
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-list"/>
+                                <span>System Logs</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-save"/>
+                                <span>Back-up Server</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-users"/>
+                                <span>Conversions</span>
+                            </a>
+
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-th-large"/>
+                                <span>Storage Logs</span>
+                            </a>
+
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-col-12 p-md-6 p-lg-3 layout-megamenu-submenu">
+                    <h6>Finance Reports</h6>
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-file"/>
+                                <span>Annual Reports</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-dollar"/>
+                                <span>Revenue Reports</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-user"/>
+                                <span>HR Reports</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-chart-bar"/>
+                                <span>Finance Margin</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-col-12 p-md-6 p-lg-3 layout-megamenu-submenu">
+                    <h6>Settings</h6>
+                    <ul>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-envelope"/>
+                                <span>E-mail Notifications</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-mobile"/>
+                                <span>Sms Alerts</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                <i class="pi pi-fw pi-globe"/>
+                                <span>Site Tracking</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="p-col-12 p-md-6 p-lg-3 layout-megamenu-submenu">
+                    <div class="content-img">
+                        <p:graphicImage name="images/image-mega.png" library="california-layout"/>
+
+                        <div class="img-megamenu">
+                            <span class="p-col-12 img-header">California</span>
+                            <span class="p-col-12 img-subheader">Application Template</span>
+                        </div>
+                        <p:commandButton type="button" value="Buy Now" styleClass="alt-btn"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </h:form>
+
+</ui:composition>

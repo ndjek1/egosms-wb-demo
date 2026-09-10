@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="content">
+        <h:form id="demoView" enctype="multipart/form-data">
+            <div class="p-grid ">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:growl id="messages" showDetail="true" />
+                        <div class="p-d-flex p-jc-between" style="margin: 5px">
+
+                            <div>
+                                <p:commandButton icon="fa fa-search"
+                                                 styleClass="p-mr-2 p-mb-2 primary-button" id="searchBtn"
+                                                 actionListener="#{demoView.reloadFilterReset()}"
+                                                 update="demoView" value="Search">
+                                </p:commandButton>
+
+                                <p:commandButton value="Add User"
+                                                 actionListener="#{myDialogForm.show}">
+                                    <f:setPropertyActionListener value="#{null}"
+                                                                 target="#{myDialogForm.model}" />
+                                    <p:ajax event="dialogReturn" listener="#{demoView.reloadFilterReset}" update="rolesTable" />
+                                </p:commandButton>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="p-grid ">
+                <div class="p-col-12">
+                    <div class="card">
+                        <p:dataTable id="rolesTable" var="model"
+                                     value="#{demoView.dataModels}" widgetVar="rolesTable"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                                     paginator="true" lazy="true"
+                                     rows="#{demoView.maximumresultsPerpage}"
+                                     emptyMessage="#{demoView.dataEmptyMessage}"
+                                     paginatorPosition="bottom" paginatorAlwaysVisible="false"
+                                     rowIndexVar="row" reflow="true" styleClass="TableAlgnment">
+                            <f:facet name="header">
+                                <div class="p-d-flex p-jc-between">
+                                    <div>
+                                        <span style="font-weight: bold">Roles</span>
+                                    </div>
+                                    <div>
+                                        <p:commandButton value="Add Role" process="@this"
+                                                         styleClass="ui-button-help" immediate="true"
+                                                         actionListener="#{myDialogForm.show}">
+                                            <f:setPropertyActionListener value="#{null}"
+                                                                         target="#{myDialogForm.model}" />
+                                            <p:ajax event="dialogReturn" listener="#{demoView.reloadFilterReset}" update="rolesTable" />
+                                        </p:commandButton>
+                                    </div>
+                                </div>
+                            </f:facet>
+                            <p:column width="30" headerText="No.">
+                                <h:outputText value="#{row + 1}" />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="First Name" />
+                                </f:facet>
+                                <h:outputText value="#{model.firstName}" />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Last Name" />
+                                </f:facet>
+                                <h:outputText value="#{model.lastName}" />
+                            </p:column>
+
+                            <p:column headerText="Action" exportable="false" width="150"
+                                      style="text-align: center">
+
+
+                                <p:commandButton icon="fa fa-edit" title="Edit"
+                                                 styleClass="ui-button-help" immediate="true"
+                                                 actionListener="#{myDialogForm.show}">
+                                    <f:setPropertyActionListener value="#{model}"
+                                                                 target="#{myDialogForm.model}" />
+
+                                    <p:ajax event="dialogReturn" update="rolesTable" />
+                                </p:commandButton>
+
+                                <p:commandButton icon="fa fa-times" title="Delete"
+                                                 styleClass="ui-button-help" immediate="true"
+                                                 actionListener="#{demoView.deleteClient(model)}" >
+                                    <p:confirm header="Confirmation"
+                                               message="Are you sure you want to delete this record?"
+                                               icon="fa fa-question-circle" />
+
+                                    <p:ajax event="dialogReturn" update="rolesTable" />
+                                </p:commandButton>
+
+
+                            </p:column>
+                        </p:dataTable>
+                        <p:blockUI block="demoView" trigger="searchBtn">
+                            <p:graphicImage value="/resources/images/workingicon.png" />
+                        </p:blockUI>
+                    </div>
+                </div>
+            </div>
+
+            <p:blockUI block="demoView">
+                <p:graphicImage value="/resources/images/workingicon.png" />
+            </p:blockUI>
+            <p:confirmDialog global="true">
+                <p:commandButton value="Yes" type="button"
+                                 styleClass="ui-confirmdialog-yes" icon="fa fa-thumbs-up" />
+                <p:commandButton value="No" type="button"
+                                 styleClass="ui-confirmdialog-no" icon="fa fa-thumbs-down" />
+            </p:confirmDialog>
+        </h:form>
+
+    </ui:define>
+</ui:composition>
