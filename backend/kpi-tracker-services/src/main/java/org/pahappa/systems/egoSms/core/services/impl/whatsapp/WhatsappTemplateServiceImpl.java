@@ -17,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.net.URLEncoder;
 
 @Service
 @Transactional
@@ -46,7 +47,7 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
         template.setName(String.valueOf(payload.get("name")));
         template.setLanguage(String.valueOf(payload.get("language")));
         template.setCategory(request.getCategory());
-        template.setBody(request.getBody().trim());
+        template.setBody(authentication(request) ? authenticationBody() : request.getBody().trim());
         template.setMetaTemplateId(text(result, "id"));
         template.setApprovalStatus(status(text(result, "status")));
         template.setComponentsJson(json(components));
@@ -70,6 +71,26 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
                 .setParameter("connection", connection).setParameter("status", RecordStatus.ACTIVE).getResultList();
     }
 
+    @Override
+    public String uploadSample(String connectionId,String fileName,String contentType,byte[] content) throws ValidationFailedException,OperationFailedException {
+        if(content==null||content.length==0)throw new ValidationFailedException("Choose a non-empty media file");
+        if(content.length>16*1024*1024)throw new ValidationFailedException("Sample media must not exceed 16 MB");
+        if(blank(contentType)||!(contentType.startsWith("image/")||contentType.startsWith("video/")||"application/pdf".equals(contentType)))throw new ValidationFailedException("Only images, MP4 videos and PDF documents are supported");
+        WhatsappConnection connection=connectionService.getLoggedInUserConnection(connectionId);
+        String encodedType;
+        try{encodedType=URLEncoder.encode(contentType,"UTF-8");}catch(Exception e){throw new IllegalStateException(e);}
+        JsonNode session=metaGraphClient.postEmpty("/"+configurationAppId()+"/uploads?file_length="+content.length+"&file_type="+encodedType,token(connection));
+        String sessionId=text(session,"id");
+        if(blank(sessionId))throw new IllegalStateException("Meta did not return an upload session ID");
+        JsonNode uploaded=metaGraphClient.upload("/"+sessionId,token(connection),contentType,content);
+        String handle=text(uploaded,"h");
+        if(blank(handle))throw new IllegalStateException("Meta did not return a sample media handle");
+        return handle;
+    }
+
+    @Autowired private MetaConfiguration metaConfiguration;
+    private String configurationAppId(){return metaConfiguration.appId();}
+
     private void upsert(WhatsappConnection connection, JsonNode item) {
         String name = text(item, "name");
         WhatsappTemplate template = find(connection, name);
@@ -81,7 +102,8 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
         template.setApprovalStatus(status(text(item, "status")));
         try { template.setCategory(WhatsappEnums.TemplateCategory.valueOf(text(item, "category").toUpperCase(Locale.ENGLISH))); }
         catch (Exception ignored) { template.setCategory(WhatsappEnums.TemplateCategory.UTILITY); }
-        template.setBody(body(item.path("components")));
+        String storedBody = body(item.path("components"));
+        template.setBody(template.getCategory() == WhatsappEnums.TemplateCategory.AUTHENTICATION && blank(storedBody) ? authenticationBody() : storedBody);
         template.setComponentsJson(item.path("components").toString());
         template.setRecordStatus(RecordStatus.ACTIVE);
         if (template.getId() == null) entityManager.persist(template);
@@ -89,6 +111,24 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
 
     private List<Map<String,Object>> buildComponents(WhatsappTemplateRequest request) throws ValidationFailedException {
         List<Map<String,Object>> result = new ArrayList<Map<String,Object>>();
+        if (authentication(request)) {
+            Map<String,Object> body = component("BODY");
+            body.put("add_security_recommendation", request.isAddSecurityRecommendation());
+            result.add(body);
+
+            Map<String,Object> footer = component("FOOTER");
+            footer.put("code_expiration_minutes", request.getCodeExpirationMinutes());
+            result.add(footer);
+
+            Map<String,Object> button = new LinkedHashMap<String,Object>();
+            button.put("type", "OTP");
+            button.put("otp_type", "COPY_CODE");
+            button.put("text", request.getOtpButtonText().trim());
+            Map<String,Object> buttons = component("BUTTONS");
+            buttons.put("buttons", Collections.singletonList(button));
+            result.add(buttons);
+            return result;
+        }
         String headerType = blank(request.getHeaderType()) ? "NONE" : request.getHeaderType().toUpperCase(Locale.ENGLISH);
         if (!"NONE".equals(headerType)) {
             Map<String,Object> header = component("HEADER");
@@ -128,8 +168,14 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
 
     private void validate(WhatsappTemplateRequest r) throws ValidationFailedException {
         if (r == null) throw new ValidationFailedException("Template details are required");
-        require(r.getConnectionId(), "Select a WhatsApp account"); require(r.getName(), "Template name is required"); require(r.getBody(), "Template body is required");
+        require(r.getConnectionId(), "Select a WhatsApp account"); require(r.getName(), "Template name is required");
         if (r.getCategory() == null) throw new ValidationFailedException("Template category is required");
+        if (authentication(r)) {
+            if (r.getCodeExpirationMinutes() == null || r.getCodeExpirationMinutes() < 1 || r.getCodeExpirationMinutes() > 90) throw new ValidationFailedException("Code expiry must be between 1 and 90 minutes");
+            require(r.getOtpButtonText(), "Copy-code button text is required");
+            return;
+        }
+        require(r.getBody(), "Template body is required");
         int expected = countVariables(r.getBody());
         if (expected != r.getBodySampleValues().size()) throw new ValidationFailedException("Provide one sample value for each body variable (expected " + expected + ")");
         for (int i=1;i<=expected;i++) if (!r.getBody().contains("{{"+i+"}}")) throw new ValidationFailedException("Template variables must be sequential, starting at {{1}}");
@@ -145,5 +191,7 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
     private String graphPath(String next){int marker=next.indexOf("/v");if(marker>=0){int slash=next.indexOf('/',marker+2);if(slash>=0)return next.substring(slash);}return next;}
     private String json(Object value){try{return mapper.writeValueAsString(value);}catch(Exception e){throw new IllegalStateException("Could not store template components",e);}}
     private void require(String value,String message)throws ValidationFailedException{if(blank(value))throw new ValidationFailedException(message);}
+    private boolean authentication(WhatsappTemplateRequest request){return request != null && request.getCategory() == WhatsappEnums.TemplateCategory.AUTHENTICATION;}
+    private String authenticationBody(){return "{{1}} is your verification code.";}
     private boolean blank(String value){return value==null||value.trim().isEmpty();}
 }

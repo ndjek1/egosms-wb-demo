@@ -9,4 +9,5 @@ import java.util.List;
 public interface WhatsappTemplateService {
     WhatsappTemplate create(WhatsappTemplateRequest request) throws ValidationFailedException, OperationFailedException;
     List<WhatsappTemplate> listAndSync(String connectionId) throws OperationFailedException;
+    String uploadSample(String connectionId,String fileName,String contentType,byte[] content) throws ValidationFailedException,OperationFailedException;
 }

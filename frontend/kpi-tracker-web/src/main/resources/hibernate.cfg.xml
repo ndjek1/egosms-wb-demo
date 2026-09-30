@@ -45,6 +45,7 @@
 		<mapping class="org.pahappa.systems.egoSms.models.settings.ApplicationSettings"/>
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappConnection" />
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappConversation" />
+		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappConversationRead" />
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappMessage" />
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappTemplate" />
 		
