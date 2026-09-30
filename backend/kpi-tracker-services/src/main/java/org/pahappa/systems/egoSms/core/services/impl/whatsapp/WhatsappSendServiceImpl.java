@@ -28,6 +28,17 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
+    public String uploadHeaderMedia(String connectionId,String fileName,String contentType,byte[] content) throws ValidationFailedException,OperationFailedException {
+        require(connectionId,"Select a WhatsApp account");
+        if(content==null||content.length==0)throw new ValidationFailedException("Choose a non-empty media file");
+        if(content.length>16*1024*1024)throw new ValidationFailedException("Header media must not exceed 16 MB");
+        if(blank(contentType)||!(contentType.startsWith("image/")||"video/mp4".equals(contentType)||"application/pdf".equals(contentType)))throw new ValidationFailedException("Choose an image, MP4 video, or PDF document");
+        WhatsappConnection connection=connectionService.getLoggedInUserConnection(connectionId);
+        JsonNode response=metaGraphClient.uploadMedia("/"+connection.getPhoneNumberId()+"/media",tokenEncryptionService.decrypt(connection.getAccessTokenCiphertext()),blank(fileName)?"header-media":fileName,contentType,content);
+        String id=response.path("id").asText(null);if(blank(id))throw new IllegalStateException("Meta uploaded the file without returning a media ID");return id;
+    }
+
+    @Override
     public WhatsappMessage send(WhatsappSendRequest request) throws ValidationFailedException, OperationFailedException {
         if (request == null) throw new ValidationFailedException("Message details are required");
         require(request.getConnectionId(), "Select a WhatsApp account");
@@ -64,6 +75,22 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
         Map<String,Object> payload = base(recipient); payload.put("type", "template");
         Map<String,Object> definition = new LinkedHashMap<String,Object>(); definition.put("name", template.getName()); definition.put("language", singleton("code", blank(template.getLanguage()) ? "en_US" : template.getLanguage()));
         List<Map<String,Object>> values = new ArrayList<Map<String,Object>>();
+        if (template.getCategory() == WhatsappEnums.TemplateCategory.AUTHENTICATION) {
+            if (request.getBodyVariables() == null || request.getBodyVariables().size() != 1) throw new ValidationFailedException("Enter the one-time password for this authentication message");
+            String otp = request.getBodyVariables().get(0);
+            require(otp, "One-time password is required");
+            Map<String,Object> body = component("body");
+            body.put("parameters", Collections.singletonList(textParameter(otp.trim())));
+            values.add(body);
+            Map<String,Object> button = component("button");
+            button.put("sub_type", "url");
+            button.put("index", "0");
+            button.put("parameters", Collections.singletonList(textParameter(otp.trim())));
+            values.add(button);
+            definition.put("components", values);
+            payload.put("template", definition);
+            return payload;
+        }
         JsonNode stored;
         try { stored = mapper.readTree(template.getComponentsJson() == null ? "[]" : template.getComponentsJson()); }
         catch (Exception e) { throw new IllegalStateException("Stored template components are invalid", e); }
@@ -73,7 +100,12 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
                 Map<String,Object> body = component("body"); body.put("parameters", textParameters(request.getBodyVariables())); values.add(body);
             } else if ("HEADER".equals(type)) {
                 String format = component.path("format").asText("").toLowerCase(Locale.ENGLISH);
-                if (Arrays.asList("image","video","document").contains(format)) {
+                if ("text".equals(format) && component.path("text").asText("").contains("{{")) {
+                    require(request.getHeaderVariable(), "A value is required for the header placeholder");
+                    Map<String,Object> header = component("header");
+                    header.put("parameters", Collections.singletonList(textParameter(request.getHeaderVariable().trim())));
+                    values.add(header);
+                } else if (Arrays.asList("image","video","document").contains(format)) {
                     require(request.getHeaderMediaId(), "Select/upload header media before sending this template");
                     Map<String,Object> media = singleton("type", format); media.put(format, singleton("id", request.getHeaderMediaId()));
                     Map<String,Object> header = component("header"); header.put("parameters", Collections.singletonList(media)); values.add(header);

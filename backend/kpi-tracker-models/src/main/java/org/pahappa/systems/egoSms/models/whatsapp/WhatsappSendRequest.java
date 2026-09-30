@@ -11,6 +11,7 @@ public class WhatsappSendRequest implements Serializable {
     private String templateId;
     private String rawBody;
     private List<String> bodyVariables = new ArrayList<String>();
+    private String headerVariable;
     private String headerMediaId;
     private List<String> buttonVariables = new ArrayList<String>();
 
@@ -24,6 +25,8 @@ public class WhatsappSendRequest implements Serializable {
     public void setRawBody(String rawBody) { this.rawBody = rawBody; }
     public List<String> getBodyVariables() { return bodyVariables; }
     public void setBodyVariables(List<String> values) { bodyVariables = values == null ? new ArrayList<String>() : values; }
+    public String getHeaderVariable() { return headerVariable; }
+    public void setHeaderVariable(String headerVariable) { this.headerVariable = headerVariable; }
     public String getHeaderMediaId() { return headerMediaId; }
     public void setHeaderMediaId(String headerMediaId) { this.headerMediaId = headerMediaId; }
     public List<String> getButtonVariables() { return buttonVariables; }

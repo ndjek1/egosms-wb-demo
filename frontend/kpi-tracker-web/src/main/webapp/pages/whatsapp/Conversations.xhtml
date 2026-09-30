@@ -1,6 +1,264 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/pages/californiatemplate/template.xhtml">
- <ui:define name="title">WhatsApp Conversations</ui:define><ui:define name="viewname">WhatsApp / Conversations</ui:define><ui:define name="content"><h:form id="conversationForm"><p:growl showDetail="true"/><div class="card"><div class="ui-g ui-fluid"><div class="ui-g-12 ui-md-9"><p:selectOneMenu value="#{whatsappWorkspace.connectionId}"><f:selectItems value="#{whatsappWorkspace.connections}" var="c" itemLabel="#{empty c.verifiedName ? c.displayPhoneNumber : c.verifiedName.concat(' — ').concat(c.displayPhoneNumber)}" itemValue="#{c.id}"/><p:ajax listener="#{whatsappWorkspace.changeConnection}" update="@form"/></p:selectOneMenu></div><div class="ui-g-12 ui-md-3"><p:commandButton value="Refresh" icon="pi pi-refresh" actionListener="#{whatsappWorkspace.refreshLocal}" update="@form"/></div></div></div>
- <div class="ui-g"><div class="ui-g-12 ui-md-4"><div class="card"><h3>Conversations</h3><p:dataList value="#{whatsappWorkspace.conversations}" var="c" emptyMessage="No inbound conversations yet"><p:commandLink actionListener="#{whatsappWorkspace.openConversation(c)}" process="@this" update=":conversationForm:thread"><div style="padding:.8rem 0"><strong>#{empty c.contactName ? c.contactNumber : c.contactName}</strong><br/><small>#{c.contactNumber} · <h:outputText value="#{c.lastActivityAt}"><f:convertDateTime pattern="dd MMM HH:mm"/></h:outputText></small></div></p:commandLink></p:dataList></div></div>
- <div class="ui-g-12 ui-md-8"><h:panelGroup id="thread" layout="block"><div class="card"><h3>#{empty whatsappWorkspace.selectedConversation ? 'Select a conversation' : whatsappWorkspace.selectedConversation.contactNumber}</h3><p:commandButton value="Refresh thread" icon="pi pi-refresh" actionListener="#{whatsappWorkspace.refreshConversation}" process="@this" update=":conversationForm:thread" rendered="#{not empty whatsappWorkspace.selectedConversation}"/><ui:repeat value="#{whatsappWorkspace.messages}" var="m"><div style="display:flex;justify-content:#{m.direction eq 'OUTBOUND' ? 'flex-end' : 'flex-start'};margin:.75rem 0"><div style="max-width:75%;padding:.75rem 1rem;border-radius:9px;background:#{m.direction eq 'OUTBOUND' ? '#d9fdd3' : '#f1f1f1'}"><h:outputText value="#{m.body}" style="white-space:pre-wrap"/><br/><small><h:outputText value="#{m.sentAt}"><f:convertDateTime pattern="dd MMM HH:mm"/></h:outputText> · #{m.messageStatus}</small><h:panelGroup rendered="#{not empty m.statusDetails}"><br/><small style="color:#b42318"><h:outputText value="#{m.statusDetails}"/></small></h:panelGroup></div></div></ui:repeat><p:outputPanel rendered="#{not empty whatsappWorkspace.selectedConversation}" style="margin-top:1rem"><p:inputTextarea value="#{whatsappWorkspace.replyBody}" rows="3" style="width:100%" placeholder="Reply within the 24-hour customer service window"/><p:commandButton value="Reply" icon="pi pi-send" actionListener="#{whatsappWorkspace.reply}" update=":conversationForm:thread" disabled="#{not whatsappWorkspace.selectedConversation.windowOpen}"/><h:outputText value="  The 24-hour reply window is closed; use an approved template." rendered="#{not whatsappWorkspace.selectedConversation.windowOpen}" style="color:#b44"/></p:outputPanel></div></h:panelGroup></div></div>
- </h:form></ui:define>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="title">WhatsApp Conversations</ui:define>
+    <ui:define name="viewname">WhatsApp / Conversations</ui:define>
+
+    <ui:define name="head">
+        <h:outputStylesheet library="css" name="whatsapp-workspace.css"/>
+        <h:outputStylesheet library="css" name="whatsapp-conversations.css"/>
+        <h:outputScript library="js" name="whatsapp-conversations.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="conversationForm">
+            <p:growl id="messages" showDetail="true"/>
+            <p:poll
+                    interval="5"
+                    listener="#{whatsappWorkspace.pollConversations}"
+                    process="@this"
+                    update=":conversationForm:conversationList :conversationForm:messageStream :conversationForm:notificationState"
+                    onstart="rememberConversationScrollPositions()"
+                    oncomplete="restoreConversationScrollPositions(); checkForNewWhatsappMessage()"
+                    stop="#{empty whatsappWorkspace.connectionId}"/>
+
+            <div class="whatsapp-workspace-layout">
+                <ui:include src="./fragments/WhatsappSubSidebar.xhtml">
+                    <ui:param name="whatsappSection" value="conversations"/>
+                </ui:include>
+                <main class="whatsapp-workspace-main">
+
+            <div class="card">
+                <div class="ui-g ui-fluid">
+                    <div class="ui-g-12 ui-md-7">
+                        <p:selectOneMenu value="#{whatsappWorkspace.connectionId}">
+                            <f:selectItems
+                                    value="#{whatsappWorkspace.connections}"
+                                    var="connection"
+                                    itemLabel="#{empty connection.verifiedName ? connection.displayPhoneNumber : connection.verifiedName.concat(' — ').concat(connection.displayPhoneNumber)}"
+                                    itemValue="#{connection.id}"/>
+                            <p:ajax
+                                    listener="#{whatsappWorkspace.changeConnection}"
+                                    update="@form"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-2">
+                        <button
+                                type="button"
+                                class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left notification-button"
+                                onclick="requestWhatsappNotificationPermission()">
+                            <span class="ui-button-icon-left ui-icon pi pi-bell"></span>
+                            <span class="ui-button-text ui-c">Notifications</span>
+                        </button>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-3">
+                        <p:commandButton
+                                value="Refresh"
+                                icon="pi pi-refresh"
+                                actionListener="#{whatsappWorkspace.refreshLocal}"
+                                update="@form"/>
+                    </div>
+                </div>
+            </div>
+
+            <div id="notificationPermissionPanel" class="card notification-permission-panel">
+                <div>
+                    <strong><i class="pi pi-bell"></i> New-message notifications</strong>
+                    <div id="notificationPermissionMessage" class="notification-permission-message">
+                        Enable browser notifications to receive an alert when a customer replies.
+                    </div>
+                </div>
+                <button
+                        id="enableNotificationButton"
+                        type="button"
+                        class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-left"
+                        onclick="requestWhatsappNotificationPermission()">
+                    <span class="ui-button-icon-left ui-icon pi pi-bell"></span>
+                    <span class="ui-button-text ui-c">Enable notifications</span>
+                </button>
+            </div>
+
+            <h:panelGroup id="notificationState" layout="block" styleClass="notification-state">
+                <span class="notification-connection">#{whatsappWorkspace.connectionId}</span>
+                <span class="notification-message-id">#{whatsappWorkspace.latestInboundMessageId}</span>
+                <span class="notification-sender">#{whatsappWorkspace.latestInboundSender}</span>
+                <span class="notification-body">#{whatsappWorkspace.latestInboundBody}</span>
+            </h:panelGroup>
+
+            <div class="conversation-layout">
+                <h:panelGroup id="conversationList" layout="block" styleClass="card conversation-list-card">
+                    <h3>
+                        Conversations
+                        <h:panelGroup rendered="#{whatsappWorkspace.totalUnreadCount gt 0}" styleClass="total-unread-badge">
+                            #{whatsappWorkspace.totalUnreadCount}
+                        </h:panelGroup>
+                    </h3>
+
+                    <div class="conversation-list-scroll">
+                        <h:panelGroup
+                                rendered="#{empty whatsappWorkspace.conversations}"
+                                layout="block"
+                                styleClass="empty-conversation-list">
+                            No inbound conversations yet
+                        </h:panelGroup>
+
+                        <ui:repeat value="#{whatsappWorkspace.conversations}" var="conversation">
+                            <p:commandLink
+                                    actionListener="#{whatsappWorkspace.openConversation(conversation)}"
+                                    process="@this"
+                                    update=":conversationForm:thread"
+                                    oncomplete="scrollConversationToBottom()">
+                                <div class="conversation-entry">
+                                    <h:panelGroup
+                                            rendered="#{whatsappWorkspace.unreadCount(conversation) gt 0}"
+                                            styleClass="conversation-unread-badge">
+                                        #{whatsappWorkspace.unreadCount(conversation)}
+                                    </h:panelGroup>
+                                    <strong>
+                                        #{empty conversation.contactName ? conversation.contactNumber : conversation.contactName}
+                                    </strong>
+                                    <br/>
+                                    <small>
+                                        #{conversation.contactNumber} ·
+                                        #{whatsappWorkspace.formatConversationTime(conversation.lastActivityAt)}
+                                    </small>
+                                </div>
+                            </p:commandLink>
+                        </ui:repeat>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup id="thread" layout="block">
+                    <div class="card thread-card">
+                        <div class="thread-heading">
+                            <h3>
+                                #{empty whatsappWorkspace.selectedConversation
+                                   ? 'Select a conversation'
+                                   : whatsappWorkspace.selectedConversation.contactNumber}
+                            </h3>
+
+                            <p:commandButton
+                                    value="Refresh thread"
+                                    icon="pi pi-refresh"
+                                    actionListener="#{whatsappWorkspace.refreshConversation}"
+                                    process="@this"
+                                    update=":conversationForm:thread"
+                                    oncomplete="scrollConversationToBottom()"
+                                    rendered="#{not empty whatsappWorkspace.selectedConversation}"/>
+                        </div>
+
+                        <h:panelGroup id="messageStream" layout="block" styleClass="message-stream">
+                            <ui:repeat value="#{whatsappWorkspace.messages}" var="message">
+                            <div class="message-row #{message.direction eq 'OUTBOUND' ? 'outbound' : 'inbound'}">
+                                <div class="message-bubble">
+                                    <h:panelGroup rendered="#{not empty message.template}">
+                                        <div class="template-label">
+                                            <i class="pi pi-file"></i>
+                                            Template · #{message.template.name}
+                                        </div>
+
+                                        <h:panelGroup
+                                                rendered="#{not empty whatsappWorkspace.templateHeaderFormat(message.template) and whatsappWorkspace.templateHeaderFormat(message.template) ne 'TEXT'}"
+                                                layout="block"
+                                                styleClass="conversation-template-media">
+                                            <div>
+                                                <i class="pi #{whatsappWorkspace.templateHeaderFormat(message.template) eq 'IMAGE' ? 'pi-image' : (whatsappWorkspace.templateHeaderFormat(message.template) eq 'VIDEO' ? 'pi-video' : 'pi-file')}"></i>
+                                                #{whatsappWorkspace.templateHeaderFormat(message.template)} header
+                                            </div>
+                                        </h:panelGroup>
+
+                                        <div class="message-content">
+                                            <h:panelGroup
+                                                    rendered="#{not empty whatsappWorkspace.templateHeaderText(message.template)}"
+                                                    layout="block"
+                                                    styleClass="message-header">
+                                                <strong>#{whatsappWorkspace.templateHeaderText(message.template)}</strong>
+                                            </h:panelGroup>
+
+                                            <div class="message-body">
+                                                <h:outputText value="#{message.body}"/>
+                                            </div>
+
+                                            <h:panelGroup
+                                                    rendered="#{not empty whatsappWorkspace.templateFooter(message.template)}"
+                                                    layout="block"
+                                                    styleClass="message-footer">
+                                                #{whatsappWorkspace.templateFooter(message.template)}
+                                            </h:panelGroup>
+
+                                            <div class="message-meta">
+                                                #{whatsappWorkspace.formatConversationTime(message.sentAt)}
+                                                · #{message.messageStatus}
+                                            </div>
+                                        </div>
+
+                                        <ui:repeat
+                                                value="#{whatsappWorkspace.templateButtons(message.template)}"
+                                                var="buttonLabel">
+                                            <div class="conversation-template-button">
+                                                <i class="pi pi-external-link"></i>
+                                                #{buttonLabel}
+                                            </div>
+                                        </ui:repeat>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{empty message.template}">
+                                        <div class="message-content">
+                                            <div class="message-body">
+                                                <h:outputText value="#{message.body}"/>
+                                            </div>
+
+                                            <div class="message-meta">
+                                                #{whatsappWorkspace.formatConversationTime(message.sentAt)}
+                                                · #{message.messageStatus}
+                                            </div>
+                                        </div>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{not empty message.statusDetails}">
+                                        <div class="message-error">
+                                            <h:outputText value="#{message.statusDetails}"/>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                            </div>
+                            </ui:repeat>
+                        </h:panelGroup>
+
+                        <p:outputPanel
+                                rendered="#{not empty whatsappWorkspace.selectedConversation}"
+                                styleClass="reply-panel">
+                            <p:inputTextarea
+                                    value="#{whatsappWorkspace.replyBody}"
+                                    rows="3"
+                                    style="width:100%"
+                                    placeholder="Reply within the 24-hour customer service window"/>
+
+                            <p:commandButton
+                                    value="Reply"
+                                    icon="pi pi-send"
+                                    actionListener="#{whatsappWorkspace.reply}"
+                                    update=":conversationForm:thread"
+                                    oncomplete="scrollConversationToBottom()"
+                                    disabled="#{not whatsappWorkspace.selectedConversation.windowOpen}"/>
+
+                            <h:outputText
+                                    value=" The 24-hour reply window is closed; use an approved template."
+                                    rendered="#{not whatsappWorkspace.selectedConversation.windowOpen}"
+                                    style="color:#b44"/>
+                        </p:outputPanel>
+                    </div>
+                </h:panelGroup>
+            </div>
+                </main>
+            </div>
+        </h:form>
+    </ui:define>
 </ui:composition>

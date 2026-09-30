@@ -1,30 +1,182 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/pages/californiatemplate/template.xhtml">
-    <ui:define name="title">WhatsApp Templates</ui:define><ui:define name="viewname">WhatsApp / Templates</ui:define>
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui"
+        template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="title">WhatsApp Templates</ui:define>
+    <ui:define name="viewname">WhatsApp / Templates</ui:define>
+
+    <ui:define name="head">
+        <h:outputStylesheet library="css" name="whatsapp-workspace.css"/>
+        <h:outputStylesheet library="css" name="whatsapp-templates.css"/>
+    </ui:define>
+
     <ui:define name="content">
-        <h:form id="templateForm">
+        <h:form id="templateForm" enctype="multipart/form-data">
             <p:growl id="messages" showDetail="true"/>
-            <div class="card"><h2>Message templates</h2><p>Create reusable messages and synchronize templates already present in the connected client WABA.</p>
-                <div class="ui-g ui-fluid"><div class="ui-g-12 ui-md-8"><p:selectOneMenu value="#{whatsappWorkspace.connectionId}"><f:selectItem itemLabel="Select connected WhatsApp account" itemValue=""/><f:selectItems value="#{whatsappWorkspace.connections}" var="c" itemLabel="#{empty c.verifiedName ? c.displayPhoneNumber : c.verifiedName.concat(' — ').concat(c.displayPhoneNumber)}" itemValue="#{c.id}"/><p:ajax listener="#{whatsappWorkspace.changeConnection}" process="@this" update="@form"/></p:selectOneMenu></div><div class="ui-g-12 ui-md-4"><p:commandButton value="Sync from Meta" icon="pi pi-refresh" actionListener="#{whatsappWorkspace.syncTemplates}" process="@this" update="@form" disabled="#{empty whatsappWorkspace.connectionId}"/></div></div>
-            </div>
-            <div class="ui-g">
-                <div class="ui-g-12 ui-lg-7"><div class="card"><h3>Create template</h3>
-                    <div class="ui-g ui-fluid">
-                        <div class="ui-g-12 ui-md-6"><p:outputLabel for="name" value="Template name"/><p:inputText id="name" value="#{whatsappWorkspace.templateRequest.name}" placeholder="order_ready" required="true"/></div>
-                        <div class="ui-g-12 ui-md-3"><p:outputLabel for="category" value="Category"/><p:selectOneMenu id="category" value="#{whatsappWorkspace.templateRequest.category}"><f:selectItem itemLabel="Utility" itemValue="UTILITY"/><f:selectItem itemLabel="Marketing" itemValue="MARKETING"/><f:selectItem itemLabel="Authentication" itemValue="AUTHENTICATION"/></p:selectOneMenu></div>
-                        <div class="ui-g-12 ui-md-3"><p:outputLabel for="language" value="Language"/><p:inputText id="language" value="#{whatsappWorkspace.templateRequest.language}"/></div>
-                        <div class="ui-g-12 ui-md-4"><p:outputLabel for="headerType" value="Header"/><p:selectOneMenu id="headerType" value="#{whatsappWorkspace.templateRequest.headerType}"><f:selectItem itemLabel="None" itemValue="NONE"/><f:selectItem itemLabel="Text" itemValue="TEXT"/><f:selectItem itemLabel="Image" itemValue="IMAGE"/><f:selectItem itemLabel="Video" itemValue="VIDEO"/><f:selectItem itemLabel="Document" itemValue="DOCUMENT"/><p:ajax process="@this" update=":templateForm:headerFields :templateForm:preview"/></p:selectOneMenu></div>
-                        <h:panelGroup id="headerFields" layout="block" styleClass="ui-g-12 ui-md-8"><p:inputText id="headerText" value="#{whatsappWorkspace.templateRequest.headerText}" placeholder="Header text" rendered="#{whatsappWorkspace.templateRequest.headerType eq 'TEXT'}"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputText><p:inputText id="headerSample" value="#{whatsappWorkspace.templateRequest.headerSample}" placeholder="Header variable sample" rendered="#{whatsappWorkspace.templateRequest.headerType eq 'TEXT'}"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputText><p:inputText id="headerMedia" value="#{whatsappWorkspace.templateRequest.headerMediaHandle}" placeholder="Meta sample media handle" rendered="#{whatsappWorkspace.templateRequest.headerType eq 'IMAGE' or whatsappWorkspace.templateRequest.headerType eq 'VIDEO' or whatsappWorkspace.templateRequest.headerType eq 'DOCUMENT'}"/></h:panelGroup>
-                        <div class="ui-g-12"><p:outputLabel for="body" value="Body"/><p:inputTextarea id="body" rows="7" value="#{whatsappWorkspace.templateRequest.body}" placeholder="Hello {{1}}, your order {{2}} is ready." required="true"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputTextarea></div>
-                        <div class="ui-g-12"><p:outputLabel for="samples" value="Variable samples (one line per placeholder)"/><p:inputTextarea id="samples" rows="3" value="#{whatsappWorkspace.bodySamples}" placeholder="Amina&#10;ORD-12345"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputTextarea></div>
-                        <div class="ui-g-12"><p:outputLabel for="footer" value="Footer (optional)"/><p:inputText id="footer" value="#{whatsappWorkspace.templateRequest.footer}" placeholder="Thank you for choosing egoSms"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputText></div>
+
+            <div class="whatsapp-workspace-layout">
+                <ui:include src="./fragments/WhatsappSubSidebar.xhtml">
+                    <ui:param name="whatsappSection" value="templates"/>
+                </ui:include>
+                <main class="whatsapp-workspace-main">
+
+            <div class="wa-shell">
+                <section class="wa-toolbar">
+                    <div class="wa-account-row">
+                        <label>WhatsApp Account</label>
+
+                        <p:selectOneMenu value="#{whatsappWorkspace.connectionId}" style="flex:1">
+                            <f:selectItem
+                                    itemLabel="Select connected WhatsApp account"
+                                    itemValue=""/>
+                            <f:selectItems
+                                    value="#{whatsappWorkspace.connections}"
+                                    var="connection"
+                                    itemLabel="#{empty connection.verifiedName ? connection.displayPhoneNumber : connection.verifiedName.concat(' — ').concat(connection.displayPhoneNumber)}"
+                                    itemValue="#{connection.id}"/>
+                            <p:ajax
+                                    listener="#{whatsappWorkspace.changeConnection}"
+                                    process="@this"
+                                    update="@form"/>
+                        </p:selectOneMenu>
+
+                        <p:commandButton
+                                icon="pi pi-refresh"
+                                title="Sync from Meta"
+                                actionListener="#{whatsappWorkspace.syncTemplates}"
+                                process="@this"
+                                update="@form"
+                                disabled="#{empty whatsappWorkspace.connectionId}"
+                                styleClass="ui-button-outlined"/>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin:1rem 0"><h3 style="margin:0">Buttons</h3><p:commandButton value="Add button" icon="pi pi-plus" actionListener="#{whatsappWorkspace.addButton}" process="@this" update=":templateForm:buttons :templateForm:preview"/></div>
-                    <h:panelGroup id="buttons" layout="block"><ui:repeat value="#{whatsappWorkspace.templateRequest.buttons}" var="button"><div class="ui-g ui-fluid" style="padding:.75rem;border:1px solid #dde5e2;border-radius:6px;margin-bottom:.75rem"><div class="ui-g-12 ui-md-3"><p:selectOneMenu value="#{button.type}"><f:selectItem itemLabel="Quick reply" itemValue="QUICK_REPLY"/><f:selectItem itemLabel="Website" itemValue="URL"/><f:selectItem itemLabel="Phone" itemValue="PHONE_NUMBER"/><p:ajax process="@this" update=":templateForm:buttons :templateForm:preview"/></p:selectOneMenu></div><div class="ui-g-12 ui-md-4"><p:inputText value="#{button.text}" placeholder="Button label"><p:ajax event="keyup" process="@this" update=":templateForm:preview"/></p:inputText></div><div class="ui-g-12 ui-md-4"><p:inputText value="#{button.value}" placeholder="URL or phone number" rendered="#{button.type ne 'QUICK_REPLY'}"/></div><div class="ui-g-12 ui-md-1"><p:commandButton icon="pi pi-times" styleClass="ui-button-danger" actionListener="#{whatsappWorkspace.removeButton(button)}" process="@this" update=":templateForm:buttons :templateForm:preview"/></div></div></ui:repeat></h:panelGroup>
-                    <p:commandButton value="Create in Meta" icon="pi pi-check" actionListener="#{whatsappWorkspace.createTemplate}" update="@form" disabled="#{empty whatsappWorkspace.connectionId}"/>
-                </div></div>
-                <div class="ui-g-12 ui-lg-5"><div class="card"><h3>WhatsApp preview</h3><h:panelGroup id="preview" layout="block"><div style="background:#e8e1d8;padding:2rem 1rem;border-radius:12px;min-height:280px"><div style="background:white;border-radius:9px;padding:1rem;box-shadow:0 1px 2px #aaa"><h:panelGroup rendered="#{whatsappWorkspace.templateRequest.headerType ne 'NONE'}"><strong><h:outputText value="#{whatsappWorkspace.templateRequest.headerType eq 'TEXT' ? whatsappWorkspace.previewHeader() : whatsappWorkspace.templateRequest.headerType.concat(' header')}"/></strong><hr/></h:panelGroup><h:outputText value="#{whatsappWorkspace.previewBody()}" style="white-space:pre-wrap"/><h:panelGroup rendered="#{not empty whatsappWorkspace.templateRequest.footer}"><div style="color:#7b8581;margin-top:.6rem;font-size:.85rem"><h:outputText value="#{whatsappWorkspace.templateRequest.footer}"/></div></h:panelGroup><ui:repeat value="#{whatsappWorkspace.templateRequest.buttons}" var="b"><div style="text-align:center;color:#0787c1;border-top:1px solid #eee;padding:.7rem;margin-top:.6rem">#{empty b.text ? 'Button' : b.text}</div></ui:repeat></div></div></h:panelGroup></div></div>
+
+                    <div class="wa-title-row">
+                        <h2>WhatsApp Message Templates</h2>
+
+                        <div class="wa-actions">
+                            <p:commandButton
+                                    type="button"
+                                    value="Add Message template"
+                                    icon="pi pi-plus"
+                                    onclick="PF('templateDialog').show()"
+                                    disabled="#{empty whatsappWorkspace.connectionId}"/>
+
+                            <div class="wa-search">
+                                <i class="pi pi-search"></i>
+                                <input
+                                        type="text"
+                                        placeholder="Search templates..."
+                                        onkeyup="filterTemplates(null, this.value)"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wa-filters">
+                        <button type="button" class="wa-filter active" data-status="ALL"
+                                onclick="filterTemplates(this, null)">
+                            All <span class="count">#{whatsappWorkspace.templateCount('ALL')}</span>
+                        </button>
+                        <button type="button" class="wa-filter" data-status="APPROVED"
+                                onclick="filterTemplates(this, null)">
+                            Approved <span class="count">#{whatsappWorkspace.templateCount('APPROVED')}</span>
+                        </button>
+                        <button type="button" class="wa-filter" data-status="PENDING"
+                                onclick="filterTemplates(this, null)">
+                            Pending <span class="count">#{whatsappWorkspace.templateCount('PENDING')}</span>
+                        </button>
+                        <button type="button" class="wa-filter" data-status="REJECTED"
+                                onclick="filterTemplates(this, null)">
+                            Rejected <span class="count">#{whatsappWorkspace.templateCount('REJECTED')}</span>
+                        </button>
+                    </div>
+                </section>
+
+                <h:panelGroup id="templateCards" layout="block">
+                    <div class="template-grid">
+                        <ui:repeat value="#{whatsappWorkspace.templates}" var="template">
+                            <article
+                                    class="template-card #{template.approvalStatus eq 'APPROVED' ? 'approved' : (template.approvalStatus eq 'REJECTED' ? 'rejected' : 'pending')}"
+                                    data-status="#{template.approvalStatus}"
+                                    data-search="#{template.name} #{template.body} #{template.category}">
+
+                                <div class="template-status">
+                                    <span>
+                                        <i class="pi #{template.approvalStatus eq 'APPROVED' ? 'pi-check-circle' : (template.approvalStatus eq 'REJECTED' ? 'pi-exclamation-triangle' : 'pi-clock')}"></i>
+                                        #{template.approvalStatus}
+                                    </span>
+                                    <span>#{template.language}</span>
+                                </div>
+
+                                <h:panelGroup
+                                        rendered="#{not empty whatsappWorkspace.templateHeaderFormat(template) and whatsappWorkspace.templateHeaderFormat(template) ne 'TEXT'}"
+                                        layout="block"
+                                        styleClass="template-media">
+                                    <div>
+                                        <i class="pi #{whatsappWorkspace.templateHeaderFormat(template) eq 'IMAGE' ? 'pi-image' : (whatsappWorkspace.templateHeaderFormat(template) eq 'VIDEO' ? 'pi-video' : 'pi-file')}"></i>
+                                        #{whatsappWorkspace.templateHeaderFormat(template)} header
+                                    </div>
+                                </h:panelGroup>
+
+                                <div class="template-copy">
+                                    <h:panelGroup rendered="#{not empty whatsappWorkspace.templateHeaderText(template)}">
+                                        <strong>#{whatsappWorkspace.templateHeaderText(template)}</strong>
+                                    </h:panelGroup>
+
+                                    <div class="template-body">
+                                        <h:outputText value="#{template.body}"/>
+                                    </div>
+
+                                    <h:panelGroup
+                                            rendered="#{not empty whatsappWorkspace.templateFooter(template)}"
+                                            layout="block"
+                                            styleClass="template-footer">
+                                        #{whatsappWorkspace.templateFooter(template)}
+                                    </h:panelGroup>
+                                </div>
+
+                                <ui:repeat value="#{whatsappWorkspace.templateButtons(template)}" var="buttonLabel">
+                                    <div class="template-button">
+                                        <i class="pi pi-external-link"></i>
+                                        #{buttonLabel}
+                                    </div>
+                                </ui:repeat>
+
+                                <div class="template-meta">
+                                    <span class="template-category">#{template.category}</span>
+                                    <span class="template-name">#{template.name}</span>
+                                    <i class="pi pi-ellipsis-v"></i>
+                                </div>
+                            </article>
+                        </ui:repeat>
+
+                        <div class="template-card add-template-card"
+                             onclick="PF('templateDialog').show()">
+                            <div class="plus"><i class="pi pi-plus"></i></div>
+                            <strong>Add a Message Template</strong>
+                            <p>Design a header, dynamic body variables and interactive buttons.</p>
+                        </div>
+                    </div>
+
+                    <h:panelGroup
+                            rendered="#{empty whatsappWorkspace.templates}"
+                            layout="block"
+                            styleClass="empty-templates">
+                        <i class="pi pi-comments" style="font-size:2.2rem"></i>
+                        <h3>No templates yet</h3>
+                        <p>Sync from Meta or create your first WhatsApp message template.</p>
+                    </h:panelGroup>
+                </h:panelGroup>
             </div>
-            <div class="card"><p:dataTable value="#{whatsappWorkspace.templates}" var="t" emptyMessage="No templates synchronized yet"><p:column headerText="Name">#{t.name}</p:column><p:column headerText="Category">#{t.category}</p:column><p:column headerText="Status">#{t.approvalStatus}</p:column><p:column headerText="Body">#{t.body}</p:column></p:dataTable></div>
+                </main>
+            </div>
+
+            <ui:include src="./fragments/TemplateBuilderDialog.xhtml"/>
         </h:form>
+
+        <h:outputScript library="js" name="whatsapp-templates.js" target="body"/>
     </ui:define>
 </ui:composition>

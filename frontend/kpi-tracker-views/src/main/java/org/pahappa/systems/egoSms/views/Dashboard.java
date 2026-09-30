@@ -1,7 +1,6 @@
 package org.pahappa.systems.egoSms.views;
 
 import com.googlecode.genericdao.search.Search;
-;
 import org.pahappa.systems.egoSms.security.HyperLinks;
 import org.sers.webutils.client.controllers.WebAppExceptionHandler;
 import org.sers.webutils.client.views.presenters.ViewPath;

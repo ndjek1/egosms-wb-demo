@@ -19,6 +19,9 @@ public class WhatsappTemplateRequest implements Serializable {
     private String headerMediaHandle;
     private String footer;
     private List<Button> buttons = new ArrayList<Button>();
+    private boolean addSecurityRecommendation = true;
+    private Integer codeExpirationMinutes = 10;
+    private String otpButtonText = "Copy Code";
 
     public String getConnectionId() { return connectionId; }
     public void setConnectionId(String connectionId) { this.connectionId = connectionId; }
@@ -44,6 +47,12 @@ public class WhatsappTemplateRequest implements Serializable {
     public void setFooter(String footer) { this.footer = footer; }
     public List<Button> getButtons() { return buttons; }
     public void setButtons(List<Button> buttons) { this.buttons = buttons == null ? new ArrayList<Button>() : buttons; }
+    public boolean isAddSecurityRecommendation() { return addSecurityRecommendation; }
+    public void setAddSecurityRecommendation(boolean value) { addSecurityRecommendation = value; }
+    public Integer getCodeExpirationMinutes() { return codeExpirationMinutes; }
+    public void setCodeExpirationMinutes(Integer value) { codeExpirationMinutes = value; }
+    public String getOtpButtonText() { return otpButtonText; }
+    public void setOtpButtonText(String value) { otpButtonText = value; }
 
     public static class Button implements Serializable {
         private static final long serialVersionUID = 1L;

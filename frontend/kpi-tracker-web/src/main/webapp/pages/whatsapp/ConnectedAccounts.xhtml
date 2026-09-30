@@ -7,12 +7,19 @@
     <ui:define name="title">Connected WhatsApp Accounts</ui:define>
     <ui:define name="viewname">WhatsApp / Connected Accounts</ui:define>
     <ui:define name="head">
+        <h:outputStylesheet library="css" name="whatsapp-workspace.css"/>
         <h:outputScript library="js" name="whatsapp-embedded-signup.js" target="head"/>
     </ui:define>
     <ui:define name="content">
         <h:form id="accountsForm">
             <p:growl id="messages" showDetail="true"/>
             <p:remoteCommand name="refreshWhatsappAccounts" actionListener="#{whatsappWorkspace.reloadConnections}" update="accountsPanel messages"/>
+
+            <div class="whatsapp-workspace-layout">
+                <ui:include src="./fragments/WhatsappSubSidebar.xhtml">
+                    <ui:param name="whatsappSection" value="accounts"/>
+                </ui:include>
+                <main class="whatsapp-workspace-main">
 
             <div class="card">
                 <div class="ui-g">
@@ -32,7 +39,7 @@
 
             <h:panelGroup id="accountsPanel" layout="block">
                 <div class="card">
-                    <p:dataTable value="#{whatsappWorkspace.connections}" var="account" reflow="true"
+                    <p:dataTable value="#{whatsappWorkspace.accountConnections}" var="account" reflow="true"
                                  emptyMessage="No WhatsApp account is connected yet. Click Connect WhatsApp to begin.">
                         <p:column headerText="Business">
                             <strong>#{empty account.verifiedName ? 'WhatsApp Business Account' : account.verifiedName}</strong>
@@ -43,11 +50,35 @@
                             <br/><small>Phone number ID: #{account.phoneNumberId}</small>
                         </p:column>
                         <p:column headerText="WABA ID">#{account.wabaId}</p:column>
-                        <p:column headerText="Status"><span style="display:inline-block;padding:.3rem .65rem;border-radius:12px;background:#dff5e8;color:#087443">#{account.connectionStatus}</span></p:column>
+                        <p:column headerText="Status"><span class="connection-status #{account.connectionStatus eq 'CONNECTED' ? 'connected' : 'disconnected'}">#{account.connectionStatus}</span></p:column>
                         <p:column headerText="Connected/updated"><h:outputText value="#{account.updatedAt}"><f:convertDateTime pattern="dd MMM yyyy HH:mm"/></h:outputText></p:column>
+                        <p:column headerText="Actions" style="width:145px;text-align:center">
+                            <p:commandButton
+                                    value="Disconnect"
+                                    icon="pi pi-unlink"
+                                    actionListener="#{whatsappWorkspace.disconnectConnection(account)}"
+                                    process="@this"
+                                    update="@form"
+                                    rendered="#{account.connectionStatus eq 'CONNECTED'}"
+                                    styleClass="ui-button-danger ui-button-outlined">
+                                <p:confirm
+                                        header="Disconnect WhatsApp"
+                                        message="Disconnect this number from egoSms? It will remain registered in Meta, and existing message history will be preserved."
+                                        icon="pi pi-exclamation-triangle"/>
+                            </p:commandButton>
+                            <h:outputText
+                                    value="Disconnected from egoSms"
+                                    rendered="#{account.connectionStatus ne 'CONNECTED'}"
+                                    style="color:#7b8581;font-size:.85rem"/>
+                        </p:column>
                     </p:dataTable>
                 </div>
             </h:panelGroup>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
+                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                <p:commandButton value="Yes, disconnect" type="button" styleClass="ui-confirmdialog-yes ui-button-danger"/>
+            </p:confirmDialog>
 
             <div class="card">
                 <h3>What happens when you connect an account?</h3>
@@ -57,6 +88,8 @@
                     <li>The WABA is subscribed to this app's webhooks and the phone number is registered.</li>
                     <li>The resulting access token is encrypted and assigned only to the currently logged-in egoSms user.</li>
                 </ol>
+            </div>
+                </main>
             </div>
         </h:form>
     </ui:define>

@@ -1,0 +1,362 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:f="http://java.sun.com/jsf/core"
+        xmlns:ui="http://java.sun.com/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
+
+    <p:dialog
+            id="createDialog"
+            widgetVar="templateDialog"
+            header="Create message template"
+            modal="true"
+            responsive="true"
+            width="1080"
+            styleClass="template-dialog"
+            closeOnEscape="true">
+
+        <div class="builder-grid">
+            <div class="builder-form">
+                <div class="ui-g ui-fluid">
+                    <div class="ui-g-12 ui-md-6">
+                        <p:outputLabel for="name" value="Template name"/>
+                        <p:inputText
+                                id="name"
+                                value="#{whatsappWorkspace.templateRequest.name}"
+                                placeholder="order_ready"
+                                required="true"/>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-3">
+                        <p:outputLabel for="category" value="Category"/>
+                        <p:selectOneMenu
+                                id="category"
+                                value="#{whatsappWorkspace.templateRequest.category}">
+                            <f:selectItem itemLabel="Utility" itemValue="UTILITY"/>
+                            <f:selectItem itemLabel="Marketing" itemValue="MARKETING"/>
+                            <f:selectItem itemLabel="Authentication" itemValue="AUTHENTICATION"/>
+                            <p:ajax listener="#{whatsappWorkspace.categoryChanged}"
+                                    process="@this"
+                                    update=":templateForm:templateFields :templateForm:preview :templateForm:messages"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <div class="ui-g-12 ui-md-3">
+                        <p:outputLabel for="language" value="Language"/>
+                        <p:inputText
+                                id="language"
+                                value="#{whatsappWorkspace.templateRequest.language}"/>
+                    </div>
+                </div>
+
+                <h:panelGroup id="templateFields" layout="block">
+                <h:panelGroup rendered="#{not whatsappWorkspace.authenticationTemplateRequest}" layout="block">
+                <div class="section-title">
+                    <span class="section-number">1</span>
+                    <h3>Header</h3>
+                </div>
+
+                <div class="ui-g ui-fluid">
+                    <div class="ui-g-12 ui-md-4">
+                        <p:selectOneMenu
+                                id="headerType"
+                                value="#{whatsappWorkspace.templateRequest.headerType}">
+                            <f:selectItem itemLabel="None" itemValue="NONE"/>
+                            <f:selectItem itemLabel="Text" itemValue="TEXT"/>
+                            <f:selectItem itemLabel="Image" itemValue="IMAGE"/>
+                            <f:selectItem itemLabel="Video" itemValue="VIDEO"/>
+                            <f:selectItem itemLabel="Document" itemValue="DOCUMENT"/>
+                            <p:ajax
+                                    listener="#{whatsappWorkspace.headerTypeChanged}"
+                                    process="@this"
+                                    update=":templateForm:headerFields :templateForm:preview :templateForm:messages"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <h:panelGroup
+                            id="headerFields"
+                            layout="block"
+                            styleClass="ui-g-12 ui-md-8">
+
+                        <h:panelGroup rendered="#{whatsappWorkspace.templateRequest.headerType eq 'TEXT'}">
+                            <p:inputText
+                                    id="headerText"
+                                    value="#{whatsappWorkspace.templateRequest.headerText}"
+                                    placeholder="Header text">
+                                <p:ajax
+                                        event="keyup"
+                                        process="@this"
+                                        update=":templateForm:preview"/>
+                            </p:inputText>
+
+                            <p:inputText
+                                    id="headerSample"
+                                    value="#{whatsappWorkspace.templateRequest.headerSample}"
+                                    placeholder="Header variable sample">
+                                <p:ajax
+                                        event="keyup"
+                                        process="@this"
+                                        update=":templateForm:preview"/>
+                            </p:inputText>
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{whatsappWorkspace.templateRequest.headerType eq 'IMAGE' or whatsappWorkspace.templateRequest.headerType eq 'VIDEO' or whatsappWorkspace.templateRequest.headerType eq 'DOCUMENT'}">
+                            <p:fileUpload
+                                    listener="#{whatsappWorkspace.uploadTemplateSample}"
+                                    mode="advanced"
+                                    auto="true"
+                                    multiple="false"
+                                    dragDropSupport="true"
+                                    sizeLimit="16777216"
+                                    allowTypes="/(\.|\/)(jpe?g|png|mp4|pdf)$/"
+                                    label="Choose sample"
+                                    update=":templateForm:headerFields :templateForm:preview :templateForm:messages"/>
+
+                            <h:panelGroup
+                                    rendered="#{not empty whatsappWorkspace.mediaFileName}"
+                                    layout="block"
+                                    style="margin-top:8px">
+                                #{whatsappWorkspace.mediaFileName}
+                                <p:commandButton
+                                        icon="pi pi-times"
+                                        actionListener="#{whatsappWorkspace.removeTemplateSample}"
+                                        process="@this"
+                                        update=":templateForm:headerFields :templateForm:preview"
+                                        styleClass="ui-button-flat ui-button-danger"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:panelGroup>
+                </div>
+
+                <div class="section-title">
+                    <span class="section-number">2</span>
+                    <h3>Message</h3>
+                </div>
+
+                <div class="ui-fluid">
+                    <p:outputLabel for="body" value="Body"/>
+                    <p:inputTextarea
+                            id="body"
+                            rows="6"
+                            value="#{whatsappWorkspace.templateRequest.body}"
+                            placeholder="Hello {{1}}, your order {{2}} is ready."
+                            required="true">
+                        <p:ajax
+                                event="keyup"
+                                process="@this"
+                                update=":templateForm:preview"/>
+                    </p:inputTextarea>
+
+                    <p:outputLabel
+                            for="samples"
+                            value="Variable samples (one line per placeholder)"/>
+                    <p:inputTextarea
+                            id="samples"
+                            rows="3"
+                            value="#{whatsappWorkspace.bodySamples}"
+                            placeholder="Amina&#10;ORD-12345">
+                        <p:ajax
+                                event="keyup"
+                                process="@this"
+                                update=":templateForm:preview"/>
+                    </p:inputTextarea>
+
+                    <p:outputLabel for="footer" value="Footer (optional)"/>
+                    <p:inputText
+                            id="footer"
+                            value="#{whatsappWorkspace.templateRequest.footer}"
+                            placeholder="Thank you for choosing egoSms">
+                        <p:ajax
+                                event="keyup"
+                                process="@this"
+                                update=":templateForm:preview"/>
+                    </p:inputText>
+                </div>
+
+                <div class="section-title">
+                    <span class="section-number">3</span>
+                    <h3>Buttons</h3>
+                    <p:commandButton
+                            value="Add button"
+                            icon="pi pi-plus"
+                            actionListener="#{whatsappWorkspace.addButton}"
+                            process="@this"
+                            update=":templateForm:buttons :templateForm:preview"
+                            styleClass="ui-button-outlined add-template-button"/>
+                </div>
+
+                <h:panelGroup id="buttons" layout="block">
+                    <ui:repeat
+                            value="#{whatsappWorkspace.templateRequest.buttons}"
+                            var="button">
+                        <div class="ui-g ui-fluid"
+                             style="padding:10px;border:1px solid #dde5e2;border-radius:8px;margin-bottom:10px">
+                            <div class="ui-g-12 ui-md-3">
+                                <p:selectOneMenu value="#{button.type}">
+                                    <f:selectItem itemLabel="Quick reply" itemValue="QUICK_REPLY"/>
+                                    <f:selectItem itemLabel="Website" itemValue="URL"/>
+                                    <f:selectItem itemLabel="Phone" itemValue="PHONE_NUMBER"/>
+                                    <p:ajax
+                                            process="@this"
+                                            update=":templateForm:buttons :templateForm:preview"/>
+                                </p:selectOneMenu>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4">
+                                <p:inputText value="#{button.text}" placeholder="Button label">
+                                    <p:ajax
+                                            event="keyup"
+                                            process="@this"
+                                            update=":templateForm:preview"/>
+                                </p:inputText>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-4">
+                                <p:inputText
+                                        value="#{button.value}"
+                                        placeholder="URL or phone number"
+                                        rendered="#{button.type ne 'QUICK_REPLY'}"/>
+                            </div>
+
+                            <div class="ui-g-12 ui-md-1">
+                                <p:commandButton
+                                        icon="pi pi-times"
+                                        styleClass="ui-button-danger"
+                                        actionListener="#{whatsappWorkspace.removeButton(button)}"
+                                        process="@this"
+                                        update=":templateForm:buttons :templateForm:preview"/>
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </h:panelGroup>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{whatsappWorkspace.authenticationTemplateRequest}" layout="block" styleClass="authentication-template-fields">
+                    <div class="section-title">
+                        <span class="section-number">1</span>
+                        <h3>Authentication message</h3>
+                    </div>
+                    <p style="color:#66756f;line-height:1.5">
+                        Meta generates and localizes the message body. The customer receives one code and a button that copies it.
+                    </p>
+                    <div class="ui-g ui-fluid">
+                        <div class="ui-g-12 ui-md-6">
+                            <p:outputLabel for="codeExpiry" value="Code expires after (minutes)"/>
+                            <p:spinner id="codeExpiry"
+                                       value="#{whatsappWorkspace.templateRequest.codeExpirationMinutes}"
+                                       min="1" max="90">
+                                <p:ajax process="@this" update=":templateForm:preview"/>
+                            </p:spinner>
+                        </div>
+                        <div class="ui-g-12 ui-md-6">
+                            <p:outputLabel for="otpButtonText" value="Copy-code button label"/>
+                            <p:inputText id="otpButtonText"
+                                         value="#{whatsappWorkspace.templateRequest.otpButtonText}"
+                                         placeholder="Copy Code">
+                                <p:ajax event="keyup" process="@this" update=":templateForm:preview"/>
+                            </p:inputText>
+                        </div>
+                        <div class="ui-g-12">
+                            <p:selectBooleanCheckbox id="securityRecommendation"
+                                                     value="#{whatsappWorkspace.templateRequest.addSecurityRecommendation}"
+                                                     itemLabel="Add a recommendation telling customers not to share the code">
+                                <p:ajax process="@this" update=":templateForm:preview"/>
+                            </p:selectBooleanCheckbox>
+                        </div>
+                    </div>
+                </h:panelGroup>
+                </h:panelGroup>
+
+                <div class="dialog-footer">
+                    <p:commandButton
+                            type="button"
+                            value="Cancel"
+                            onclick="PF('templateDialog').hide()"
+                            styleClass="ui-button-secondary"/>
+                    <p:commandButton
+                            value="Create in Meta"
+                            icon="pi pi-check"
+                            actionListener="#{whatsappWorkspace.createTemplate}"
+                            update="@form"
+                            disabled="#{empty whatsappWorkspace.connectionId}"/>
+                </div>
+            </div>
+
+            <div class="builder-preview">
+                <h3>Template preview</h3>
+
+                <h:panelGroup id="preview" layout="block">
+                    <div class="phone-bg">
+                        <div class="phone-bubble">
+                            <h:panelGroup
+                                    rendered="#{whatsappWorkspace.templateRequest.headerType eq 'IMAGE'}"
+                                    layout="block">
+                                <h:graphicImage
+                                        value="#{whatsappWorkspace.mediaPreviewDataUrl}"
+                                        rendered="#{not empty whatsappWorkspace.mediaPreviewDataUrl}"
+                                        style="display:block;width:100%;max-height:230px;object-fit:cover"/>
+                                <h:panelGroup
+                                        rendered="#{empty whatsappWorkspace.mediaPreviewDataUrl}"
+                                        layout="block"
+                                        styleClass="template-media">
+                                    <div><i class="pi pi-image"></i>Image sample</div>
+                                </h:panelGroup>
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                    rendered="#{whatsappWorkspace.templateRequest.headerType eq 'VIDEO'}"
+                                    layout="block"
+                                    styleClass="template-media">
+                                <div><i class="pi pi-video"></i>Video sample</div>
+                            </h:panelGroup>
+
+                            <h:panelGroup
+                                    rendered="#{whatsappWorkspace.templateRequest.headerType eq 'DOCUMENT'}"
+                                    layout="block"
+                                    styleClass="template-media">
+                                <div><i class="pi pi-file"></i>Document sample</div>
+                            </h:panelGroup>
+
+                            <div style="padding:15px">
+                                <h:panelGroup rendered="#{whatsappWorkspace.templateRequest.headerType eq 'TEXT'}">
+                                    <strong>#{whatsappWorkspace.previewHeader()}</strong>
+                                    <hr/>
+                                </h:panelGroup>
+
+                                <h:outputText
+                                        value="#{whatsappWorkspace.previewBody()}"
+                                        style="white-space:pre-wrap"/>
+
+                                <h:panelGroup
+                                        rendered="#{not empty whatsappWorkspace.templateRequest.footer}"
+                                        layout="block"
+                                        styleClass="template-footer">
+                                    #{whatsappWorkspace.templateRequest.footer}
+                                </h:panelGroup>
+                                <h:panelGroup rendered="#{whatsappWorkspace.authenticationTemplateRequest}"
+                                              layout="block"
+                                              styleClass="template-footer">
+                                    This code expires in #{whatsappWorkspace.templateRequest.codeExpirationMinutes} minutes.
+                                </h:panelGroup>
+                            </div>
+
+                            <ui:repeat
+                                    value="#{whatsappWorkspace.templateRequest.buttons}"
+                                    var="button">
+                                <div class="template-button">
+                                    #{empty button.text ? 'Button' : button.text}
+                                </div>
+                            </ui:repeat>
+                            <h:panelGroup rendered="#{whatsappWorkspace.authenticationTemplateRequest}" layout="block">
+                                <div class="template-button">
+                                    <i class="pi pi-copy" style="margin-right:.4rem"></i>
+                                    #{empty whatsappWorkspace.templateRequest.otpButtonText ? 'Copy Code' : whatsappWorkspace.templateRequest.otpButtonText}
+                                </div>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </div>
+        </div>
+    </p:dialog>
+</ui:composition>

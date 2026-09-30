@@ -1,0 +1,147 @@
+.wa-shell {
+    min-height: 640px;
+    padding: 24px;
+    border-radius: 14px;
+    background: #f5f7fb;
+}
+
+.wa-toolbar {
+    margin-bottom: 20px;
+    padding: 18px 22px;
+    border: 1px solid #e4e9f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.wa-account-row, .wa-title-row, .wa-actions, .wa-filters,
+.template-status, .template-meta, .section-title, .dialog-footer {
+    display: flex;
+    align-items: center;
+}
+
+.wa-account-row { max-width: 610px; gap: 14px; }
+.wa-account-row label { color: #4c586a; font-weight: 700; white-space: nowrap; }
+.wa-title-row { justify-content: space-between; gap: 16px; margin: 24px 0 14px; }
+.wa-title-row h2 { margin: 0; color: #182236; font-size: 24px; }
+.wa-actions, .wa-filters { gap: 10px; }
+
+.wa-search { position: relative; min-width: 270px; }
+.wa-search i { position: absolute; top: 13px; left: 13px; color: #8b97a8; }
+.wa-search input {
+    width: 100%; height: 42px; padding: 0 12px 0 38px;
+    border: 1px solid #d9dfe8; border-radius: 8px;
+}
+
+.wa-filters { overflow: auto; padding-bottom: 10px; border-bottom: 1px solid #e3e7ed; }
+.wa-filter {
+    padding: 8px 12px; border: 0; border-radius: 7px; background: transparent;
+    color: #465266; cursor: pointer; white-space: nowrap;
+}
+.wa-filter.active { background: #1769e8; color: #fff; }
+.wa-filter .count {
+    margin-left: 5px; padding: 1px 6px; border-radius: 10px;
+    background: rgba(110, 124, 145, .12); font-size: 11px;
+}
+.wa-filter.active .count { background: rgba(255, 255, 255, .22); }
+
+.template-grid {
+    display: grid; grid-template-columns: repeat(3, minmax(250px, 1fr));
+    gap: 22px; margin-top: 24px;
+}
+.template-card {
+    display: flex; min-height: 360px; overflow: hidden; flex-direction: column;
+    border: 2px solid #cfd7e2; border-radius: 14px; background: #fff; transition: .2s;
+}
+.template-card:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(25, 43, 75, .10); }
+.template-card.approved { border-color: #20ae82; }
+.template-card.pending { border-color: #e8b72c; }
+.template-card.rejected { border-color: #e64c68; }
+
+.template-status {
+    justify-content: space-between; padding: 13px 15px; border-bottom: 1px solid #e5e9ef;
+    font-size: 12px; font-weight: 800; letter-spacing: .04em;
+}
+.approved .template-status { background: #f0fbf7; color: #15956f; }
+.pending .template-status { background: #fffbeb; color: #b77d09; }
+.rejected .template-status { background: #fff2f5; color: #d43052; }
+
+.template-media {
+    display: flex; height: 155px; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #e9f6f1, #dceae5); color: #619184; text-align: center;
+}
+.template-media i { display: block; margin-bottom: 8px; font-size: 38px; }
+.template-copy { padding: 15px; flex: 1; }
+.template-copy strong { display: block; margin-bottom: 8px; color: #1f2937; }
+.template-body { min-height: 65px; color: #364152; line-height: 1.5; white-space: pre-wrap; }
+.template-footer { margin-top: 10px; color: #8993a2; font-size: 12px; font-style: italic; }
+.template-button {
+    padding: 10px; border-top: 1px solid #e5e9ef;
+    color: #1769e8; font-weight: 600; text-align: center;
+}
+.template-meta {
+    justify-content: space-between; padding: 12px 15px; border-top: 1px solid #e5e9ef;
+    background: #f7f9fc; font-size: 12px;
+}
+.template-category {
+    padding: 4px 8px; border-radius: 5px; background: #e9eef5;
+    color: #687487; text-transform: lowercase;
+}
+.template-name {
+    overflow: hidden; margin-left: 10px; color: #526074; font-family: monospace;
+    text-overflow: ellipsis; white-space: nowrap;
+}
+
+.add-template-card {
+    align-items: center; justify-content: center; border: 2px dashed #3988ef;
+    background: transparent; color: #1e6ed8; text-align: center; cursor: pointer;
+}
+.add-template-card .plus {
+    display: flex; width: 64px; height: 64px; margin-bottom: 14px;
+    align-items: center; justify-content: center; border-radius: 50%;
+    background: #eaf3ff; font-size: 32px;
+}
+.empty-templates {
+    margin-top: 24px; padding: 40px; border: 1px dashed #cbd5e1;
+    border-radius: 12px; background: #fff; color: #6b778a; text-align: center;
+}
+
+.template-dialog { max-height: calc(100vh - 32px) !important; }
+.template-dialog .ui-dialog-content {
+    max-height: calc(100vh - 105px) !important; overflow-y: auto !important;
+    padding: 0 !important; overscroll-behavior: contain;
+}
+.builder-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(310px, .75fr); }
+.builder-form { padding: 22px 22px 0; }
+.builder-preview { padding: 22px; border-left: 1px solid #e2e8f0; background: #f5f7fb; }
+.section-title { gap: 9px; margin: 18px 0 12px; }
+.section-title h3 { margin: 0; }
+.section-title > .section-number {
+    display: flex; width: 27px; height: 27px; align-items: center; justify-content: center;
+    border-radius: 50%; background: #e8f6ef; color: #07945c; font-weight: 700;
+}
+.section-title .add-template-button {
+    width: auto;
+    margin-left: auto;
+    padding: .45rem .8rem;
+}
+.phone-bg { min-height: 330px; padding: 24px 12px; border-radius: 12px; background: #e8e1d8; }
+.phone-bubble { overflow: hidden; border-radius: 9px; background: #fff; box-shadow: 0 1px 2px #aaa; }
+.dialog-footer {
+    position: sticky; z-index: 5; bottom: 0; justify-content: flex-end; gap: 10px;
+    margin-top: 18px; padding: 14px 0 18px; border-top: 1px solid #e4e8ee;
+    background: #fff; box-shadow: 0 -8px 14px rgba(255, 255, 255, .94);
+}
+
+@media (max-width: 1100px) {
+    .template-grid { grid-template-columns: repeat(2, minmax(250px, 1fr)); }
+}
+
+@media (max-width: 760px) {
+    .wa-title-row, .wa-account-row, .wa-actions { align-items: stretch; flex-direction: column; }
+    .wa-search { min-width: 0; }
+    .template-grid, .builder-grid { grid-template-columns: 1fr; }
+    .builder-preview { border-top: 1px solid #e2e8f0; border-left: 0; }
+    .wa-shell { padding: 12px; }
+    .template-dialog { width: calc(100vw - 18px) !important; }
+    .template-dialog .ui-dialog-content { max-height: calc(100vh - 85px) !important; }
+}

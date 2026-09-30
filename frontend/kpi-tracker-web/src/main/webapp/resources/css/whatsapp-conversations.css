@@ -1,0 +1,247 @@
+.conversation-layout {
+    display: grid;
+    grid-template-columns: minmax(260px, .72fr) minmax(0, 1.6fr);
+    gap: 18px;
+}
+
+.notification-state {
+    display: none;
+}
+
+.notification-button {
+    width: 100%;
+    height: 36px;
+}
+
+.notification-permission-panel {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 18px;
+    border-left: 4px solid #168a57;
+}
+
+.notification-permission-message {
+    margin-top: 4px;
+    color: #66756f;
+}
+
+.notification-permission-panel.permission-granted {
+    border-left-color: #168a57;
+    background: #f2faf6;
+}
+
+.notification-permission-panel.permission-denied {
+    border-left-color: #c43d3d;
+    background: #fff6f6;
+}
+
+@media (max-width: 650px) {
+    .notification-permission-panel {
+        align-items: stretch;
+        flex-direction: column;
+    }
+}
+
+.conversation-list-card,
+.thread-card {
+    height: 68vh;
+    min-height: 480px;
+    max-height: 760px;
+    overflow: hidden;
+}
+
+.conversation-list-card,
+.thread-card {
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-list-card h3 {
+    flex: 0 0 auto;
+}
+
+.conversation-list-scroll,
+.message-stream {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+}
+
+.conversation-list-scroll {
+    padding-right: 5px;
+}
+
+.empty-conversation-list {
+    padding: 18px 4px;
+    color: #7a8798;
+}
+
+.message-stream {
+    padding: 2px 8px 10px 2px;
+}
+
+.conversation-entry {
+    position: relative;
+    padding: 13px 4px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+.conversation-unread-badge,
+.total-unread-badge {
+    display: inline-flex;
+    min-width: 22px;
+    height: 22px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: #168a57;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.conversation-unread-badge {
+    position: absolute;
+    top: 12px;
+    right: 6px;
+}
+
+.total-unread-badge {
+    margin-left: 7px;
+    vertical-align: middle;
+}
+
+.conversation-entry strong {
+    color: #1f2937;
+}
+
+.conversation-entry small {
+    color: #7a8798;
+}
+
+.thread-heading {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+}
+
+.thread-heading h3 {
+    margin: 0;
+}
+
+.message-row {
+    display: flex;
+    margin: 12px 0;
+}
+
+.message-row.outbound { justify-content: flex-end; }
+.message-row.inbound { justify-content: flex-start; }
+
+.message-bubble {
+    width: fit-content;
+    max-width: 78%;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #f1f1f1;
+    box-shadow: 0 1px 2px rgba(28, 39, 49, .14);
+}
+
+.message-row.outbound .message-bubble {
+    background: #d9fdd3;
+}
+
+.template-label {
+    padding: 7px 12px;
+    border-bottom: 1px solid rgba(70, 95, 83, .14);
+    color: #527065;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.conversation-template-media {
+    display: flex;
+    min-width: 290px;
+    height: 145px;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e4eee9, #cadbd3);
+    color: #5c786c;
+    text-align: center;
+}
+
+.conversation-template-media i {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 30px;
+}
+
+.message-content {
+    padding: 11px 13px 8px;
+}
+
+.message-header {
+    display: block;
+    margin-bottom: 7px;
+    color: #202a34;
+}
+
+.message-body {
+    color: #25313c;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.message-footer {
+    margin-top: 8px;
+    color: #718078;
+    font-size: 12px;
+}
+
+.conversation-template-button {
+    padding: 9px 12px;
+    border-top: 1px solid rgba(70, 95, 83, .14);
+    color: #087eb5;
+    font-weight: 600;
+    text-align: center;
+}
+
+.message-meta {
+    margin-top: 7px;
+    color: #66766e;
+    font-size: 11px;
+    text-align: right;
+}
+
+.message-error {
+    padding: 0 13px 10px;
+    color: #b42318;
+    font-size: 12px;
+}
+
+.reply-panel {
+    flex: 0 0 auto;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #e6ebef;
+}
+
+@media (max-width: 850px) {
+    .conversation-layout { grid-template-columns: 1fr; }
+    .conversation-list-card {
+        height: 280px;
+        min-height: 280px;
+    }
+    .thread-card {
+        height: 70vh;
+        min-height: 460px;
+    }
+    .message-bubble { max-width: 90%; }
+}

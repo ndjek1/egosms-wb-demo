@@ -1,0 +1,46 @@
+<ui:composition
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://java.sun.com/jsf/html"
+        xmlns:ui="http://java.sun.com/jsf/facelets">
+
+    <aside class="whatsapp-sub-sidebar" aria-label="WhatsApp navigation">
+        <div class="whatsapp-sub-sidebar-title">
+            <span class="whatsapp-sub-sidebar-logo"><i class="pi pi-whatsapp"></i></span>
+            <div>
+                <strong>WhatsApp Center</strong>
+                <small>Messaging workspace</small>
+            </div>
+        </div>
+
+        <nav class="whatsapp-sub-navigation">
+            <a href="#{request.contextPath}/pages/whatsapp/ConnectedAccounts.xhtml"
+               class="whatsapp-sub-link #{whatsappSection eq 'accounts' ? 'active' : ''}">
+                <i class="pi pi-link"></i>
+                <span>Connected accounts</span>
+            </a>
+
+            <a href="#{request.contextPath}/pages/whatsapp/Templates.xhtml"
+               class="whatsapp-sub-link #{whatsappSection eq 'templates' ? 'active' : ''}">
+                <i class="pi pi-file-edit"></i>
+                <span>Templates</span>
+            </a>
+
+            <a href="#{request.contextPath}/pages/whatsapp/Send.xhtml"
+               class="whatsapp-sub-link #{whatsappSection eq 'send' ? 'active' : ''}">
+                <i class="pi pi-send"></i>
+                <span>Send message</span>
+            </a>
+
+            <a href="#{request.contextPath}/pages/whatsapp/Conversations.xhtml"
+               class="whatsapp-sub-link #{whatsappSection eq 'conversations' ? 'active' : ''}">
+                <i class="pi pi-comments"></i>
+                <span>Conversations</span>
+                <h:panelGroup
+                        rendered="#{whatsappWorkspace.totalUnreadCount gt 0}"
+                        styleClass="whatsapp-sub-unread">
+                    #{whatsappWorkspace.totalUnreadCount}
+                </h:panelGroup>
+            </a>
+        </nav>
+    </aside>
+</ui:composition>
