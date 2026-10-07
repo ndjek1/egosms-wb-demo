@@ -2,7 +2,7 @@ package org.pahappa.systems.egoSms.security;
 
 public class HyperLinks {
 
-    public static final String DASHBOARD = "/pages/dashboard/Dashboard.xhtml?faces-redirect=true";
+    public static final String DASHBOARD = "/pages/whatsapp/ConnectedAccounts.xhtml?faces-redirect=true";
 
     public static final String MAIL_SETTING_FORM = "/pages/setting/MailSettingForm.xhtml?faces-redirect=true";
 

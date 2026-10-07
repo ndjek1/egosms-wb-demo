@@ -78,6 +78,19 @@
     padding: 10px; border-top: 1px solid #e5e9ef;
     color: #1769e8; font-weight: 600; text-align: center;
 }
+.template-click-stats {
+    padding: 11px 15px; border-top: 1px solid #e5e9ef; background: #f5fbf8;
+}
+.template-click-heading, .template-click-values {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.template-click-heading { color: #486259; font-size: 12px; font-weight: 700; }
+.template-click-heading i { margin-right: 4px; color: #16a36a; }
+.template-click-heading small { color: #84938d; font-weight: 400; }
+.template-click-values { margin-top: 7px; color: #65746e; font-size: 12px; }
+.template-click-values strong { margin-right: 3px; color: #0d6f49; font-size: 18px; }
+.template-click-unavailable { color: #75837e; font-size: 11px; line-height: 1.4; }
+.template-click-unavailable i { margin-right: 4px; color: #8a9893; }
 .template-meta {
     justify-content: space-between; padding: 12px 15px; border-top: 1px solid #e5e9ef;
     background: #f7f9fc; font-size: 12px;

@@ -145,6 +145,26 @@
                                     </div>
                                 </ui:repeat>
 
+                                <h:panelGroup
+                                        rendered="#{whatsappWorkspace.templateHasWebsiteButton(template)}"
+                                        layout="block"
+                                        styleClass="template-click-stats">
+                                    <h:panelGroup rendered="#{not empty template.clickAnalyticsUpdatedAt}" layout="block">
+                                        <div class="template-click-heading">
+                                            <span><i class="pi pi-chart-bar"></i> Website clicks</span>
+                                            <small>Last 7 days</small>
+                                        </div>
+                                        <div class="template-click-values">
+                                            <span><strong>#{empty template.urlButtonClicks ? 0 : template.urlButtonClicks}</strong> total</span>
+                                            <span><strong>#{empty template.uniqueUrlButtonClicks ? 0 : template.uniqueUrlButtonClicks}</strong> unique</span>
+                                        </div>
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{empty template.clickAnalyticsUpdatedAt}" layout="block" styleClass="template-click-unavailable">
+                                        <i class="pi pi-info-circle"></i>
+                                        <h:outputText value="#{empty template.clickAnalyticsError ? 'Click statistics have not been synchronized yet.' : template.clickAnalyticsError}"/>
+                                    </h:panelGroup>
+                                </h:panelGroup>
+
                                 <div class="template-meta">
                                     <span class="template-category">#{template.category}</span>
                                     <span class="template-name">#{template.name}</span>

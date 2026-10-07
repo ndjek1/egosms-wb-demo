@@ -23,12 +23,13 @@
 
             <div class="card">
                 <div class="ui-g">
-                    <div class="ui-g-12 ui-md-8">
+                    <div class="ui-g-12 ui-md-7">
                         <h2 style="margin-bottom:.35rem">Connected WhatsApp accounts</h2>
-                        <p style="margin-top:0;color:#687772">Connect a client's WhatsApp Business Account and phone number through Meta Embedded Signup.</p>
+                        <p style="margin-top:0;color:#687772">Connect a new Cloud API number</p>
                     </div>
-                    <div class="ui-g-12 ui-md-4" style="text-align:right;padding-top:1.4rem">
-                        <p:commandButton type="button" id="connectWhatsapp" value="Connect WhatsApp" icon="pi pi-plus" styleClass="ui-button-success"/>
+                    <div class="ui-g-12 ui-md-5 connect-account-actions">
+                        <p:commandButton type="button" id="connectWhatsapp" value="Connect new number" icon="pi pi-plus" styleClass="ui-button-success"/>
+<!--                        <p:commandButton type="button" id="connectExistingWhatsapp" value="Connect existing app number" icon="pi pi-mobile" styleClass="ui-button-outlined"/>-->
                     </div>
                 </div>
                 <div id="signupConfiguration"
@@ -83,9 +84,11 @@
             <div class="card">
                 <h3>What happens when you connect an account?</h3>
                 <ol style="line-height:1.8">
-                    <li>Meta asks the logged-in client to select or create their business portfolio, WABA and phone number.</li>
+                    <li>For a new number, Meta asks the client to select or create their business portfolio, WABA and phone number.</li>
+                    <li>For an existing WhatsApp Business app number, choose <strong>Connect existing app number</strong>. The client confirms the number in Meta and keeps using the mobile app.</li>
                     <li>egoSms securely exchanges the one-time authorization code on the server.</li>
-                    <li>The WABA is subscribed to this app's webhooks and the phone number is registered.</li>
+                    <li>The WABA is subscribed to this app's webhooks. New Cloud API numbers are registered; coexistence numbers are not re-registered.</li>
+                    <li>For coexistence, Meta synchronizes contacts and eligible message history only when the client approves those options.</li>
                     <li>The resulting access token is encrypted and assigned only to the currently logged-in egoSms user.</li>
                 </ol>
             </div>

@@ -65,7 +65,7 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
         WhatsappConversation conversation = dataService.findOrCreateConversation(connection, recipient, null);
         WhatsappMessage message = new WhatsappMessage();
         message.setConversation(conversation); message.setTemplate(template); message.setDirection(WhatsappEnums.Direction.OUTBOUND);
-        message.setBody(storedBody); message.setMetaMessageId(metaMessageId); message.setMessageStatus(WhatsappEnums.MessageStatus.SENT);
+        message.setBody(storedBody); message.setRenderedHeader(renderedHeader(template, request)); message.setMetaMessageId(metaMessageId); message.setMessageStatus(WhatsappEnums.MessageStatus.SENT);
         message.setSentAt(new Date()); message.setRecordStatus(RecordStatus.ACTIVE); entityManager.persist(message);
         return message;
     }
@@ -135,6 +135,18 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
     private Map<String,Object> textParameter(String text){Map<String,Object> v=component("text");v.put("text",text==null?"":text);return v;}
     private List<Map<String,Object>> textParameters(List<String> values){List<Map<String,Object>> result=new ArrayList<Map<String,Object>>();for(String value:values)result.add(textParameter(value));return result;}
     private String render(String body,List<String> values){String rendered=body==null?"":body;for(int i=0;i<values.size();i++)rendered=rendered.replace("{{"+(i+1)+"}}",values.get(i)==null?"":values.get(i));return rendered;}
+    private String renderedHeader(WhatsappTemplate template,WhatsappSendRequest request){
+        if(template==null||blank(template.getComponentsJson()))return null;
+        try{
+            JsonNode components=mapper.readTree(template.getComponentsJson());
+            if(components.isArray())for(JsonNode component:components)if("HEADER".equalsIgnoreCase(component.path("type").asText())&&"TEXT".equalsIgnoreCase(component.path("format").asText())){
+                String header=component.path("text").asText(null);
+                if(header!=null&&!blank(request.getHeaderVariable()))header=header.replace("{{1}}",request.getHeaderVariable().trim());
+                return header;
+            }
+        }catch(Exception ignored){}
+        return null;
+    }
     private String normalize(String value){return value.trim().replaceAll("[^0-9]","");}
     private void require(String value,String message)throws ValidationFailedException{if(blank(value))throw new ValidationFailedException(message);}
     private boolean blank(String value){return value==null||value.trim().isEmpty();}

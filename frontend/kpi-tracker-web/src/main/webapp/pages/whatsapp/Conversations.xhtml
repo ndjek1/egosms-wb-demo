@@ -12,11 +12,12 @@
     <ui:define name="head">
         <h:outputStylesheet library="css" name="whatsapp-workspace.css"/>
         <h:outputStylesheet library="css" name="whatsapp-conversations.css"/>
+        <h:outputStylesheet library="css" name="whatsapp-conversation-template.css"/>
         <h:outputScript library="js" name="whatsapp-conversations.js"/>
     </ui:define>
 
     <ui:define name="content">
-        <h:form id="conversationForm">
+        <h:form id="conversationForm" enctype="multipart/form-data">
             <p:growl id="messages" showDetail="true"/>
             <p:poll
                     interval="5"
@@ -144,14 +145,10 @@
                                    : whatsappWorkspace.selectedConversation.contactNumber}
                             </h3>
 
-                            <p:commandButton
-                                    value="Refresh thread"
-                                    icon="pi pi-refresh"
-                                    actionListener="#{whatsappWorkspace.refreshConversation}"
-                                    process="@this"
-                                    update=":conversationForm:thread"
-                                    oncomplete="scrollConversationToBottom()"
-                                    rendered="#{not empty whatsappWorkspace.selectedConversation}"/>
+                            <h:panelGroup rendered="#{not empty whatsappWorkspace.selectedConversation}" styleClass="thread-actions">
+                                <p:commandButton value="Send template" icon="pi pi-file" actionListener="#{whatsappWorkspace.prepareConversationTemplate}" process="@this" update=":conversationForm:conversationTemplateDialog" oncomplete="PF('conversationTemplateDialog').show()"/>
+                                <p:commandButton value="Refresh thread" icon="pi pi-refresh" actionListener="#{whatsappWorkspace.refreshConversation}" process="@this" update=":conversationForm:thread" oncomplete="scrollConversationToBottom()"/>
+                            </h:panelGroup>
                         </div>
 
                         <h:panelGroup id="messageStream" layout="block" styleClass="message-stream">
@@ -176,10 +173,10 @@
 
                                         <div class="message-content">
                                             <h:panelGroup
-                                                    rendered="#{not empty whatsappWorkspace.templateHeaderText(message.template)}"
+                                                    rendered="#{not empty whatsappWorkspace.messageHeaderText(message)}"
                                                     layout="block"
                                                     styleClass="message-header">
-                                                <strong>#{whatsappWorkspace.templateHeaderText(message.template)}</strong>
+                                                <strong>#{whatsappWorkspace.messageHeaderText(message)}</strong>
                                             </h:panelGroup>
 
                                             <div class="message-body">
@@ -257,6 +254,54 @@
                     </div>
                 </h:panelGroup>
             </div>
+
+            <p:dialog id="conversationTemplateDialog" widgetVar="conversationTemplateDialog" header="Send an approved template" modal="true" responsive="true" width="1040" styleClass="conversation-template-dialog">
+                <h:panelGroup id="conversationTemplateFields" layout="block" styleClass="conversation-template-composer">
+                    <div class="conversation-template-form">
+                        <p>Send to <strong>#{empty whatsappWorkspace.selectedConversation ? '' : whatsappWorkspace.selectedConversation.contactNumber}</strong></p>
+                        <p:outputLabel for="conversationTemplate" value="Approved template"/>
+                        <p:selectOneMenu id="conversationTemplate" value="#{whatsappWorkspace.conversationTemplateRequest.templateId}" style="width:100%">
+                            <f:selectItem itemLabel="Choose a template" itemValue=""/>
+                            <f:selectItems value="#{whatsappWorkspace.approvedTemplates}" var="template" itemLabel="#{template.name.concat(' — ').concat(template.language)}" itemValue="#{template.id}"/>
+                            <p:ajax listener="#{whatsappWorkspace.conversationTemplateChanged}" process="@this" update=":conversationForm:conversationTemplateFields"/>
+                        </p:selectOneMenu>
+
+                        <h:panelGroup rendered="#{not empty whatsappWorkspace.conversationTemplateRequest.templateId}" layout="block" styleClass="conversation-template-inputs">
+                            <h:panelGroup rendered="#{not empty whatsappWorkspace.conversationTemplateHeaderInput}" layout="block" styleClass="template-input-row">
+                                <p:outputLabel value="#{whatsappWorkspace.conversationTemplateHeaderInput.label}"/>
+                                <p:inputText value="#{whatsappWorkspace.conversationTemplateHeaderInput.value}" required="true" requiredMessage="Header placeholder value is required" placeholder="#{whatsappWorkspace.conversationTemplateHeaderInput.example}"><p:ajax event="keyup" process="@this" update=":conversationForm:conversationTemplatePreview"/></p:inputText>
+                            </h:panelGroup>
+                            <ui:repeat value="#{whatsappWorkspace.conversationTemplateBodyInputs}" var="variable">
+                                <div class="template-input-row"><p:outputLabel value="#{variable.label}"/><p:inputText value="#{variable.value}" required="true" requiredMessage="#{variable.label} is required" placeholder="#{variable.example}"><p:ajax event="keyup" process="@this" update=":conversationForm:conversationTemplatePreview"/></p:inputText></div>
+                            </ui:repeat>
+                            <h:panelGroup rendered="#{whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'IMAGE' or whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'VIDEO' or whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'DOCUMENT'}" layout="block" styleClass="template-input-row">
+                                <p:outputLabel value="Header media"/>
+                                <p:fileUpload listener="#{whatsappWorkspace.uploadConversationTemplateMedia}" mode="advanced" auto="true" multiple="false" dragDropSupport="true" sizeLimit="16777216" allowTypes="/(\.|\/)(jpe?g|png|mp4|pdf)$/" label="Choose file" update=":conversationForm:conversationTemplateFields :conversationForm:messages"/>
+                                <h:panelGroup rendered="#{not empty whatsappWorkspace.conversationTemplateMediaFileName}" layout="block" styleClass="selected-template-media"><i class="pi pi-check-circle"></i> #{whatsappWorkspace.conversationTemplateMediaFileName} <p:commandButton icon="pi pi-times" title="Remove" actionListener="#{whatsappWorkspace.removeConversationTemplateMedia}" process="@this" update=":conversationForm:conversationTemplateFields" styleClass="ui-button-flat ui-button-danger"/></h:panelGroup>
+                            </h:panelGroup>
+                            <ui:repeat value="#{whatsappWorkspace.conversationTemplateButtonInputs}" var="variable">
+                                <div class="template-input-row"><p:outputLabel value="#{variable.label}"/><p:inputText value="#{variable.value}" required="true" requiredMessage="#{variable.label} is required" placeholder="#{variable.example}"/></div>
+                            </ui:repeat>
+                        </h:panelGroup>
+                    </div>
+
+                    <h:panelGroup id="conversationTemplatePreview" layout="block" styleClass="conversation-template-preview">
+                        <div class="conversation-preview-title"><div><span>Preview</span><small>How it will appear in WhatsApp</small></div><i class="pi pi-comments"></i></div>
+                        <div class="conversation-phone-frame">
+                            <div class="conversation-phone-header"><i class="pi pi-angle-left"></i><span class="conversation-phone-avatar"><i class="pi pi-user"></i></span><div><strong>#{empty whatsappWorkspace.selectedConversation.contactName ? whatsappWorkspace.selectedConversation.contactNumber : whatsappWorkspace.selectedConversation.contactName}</strong><small>WhatsApp</small></div><i class="pi pi-ellipsis-v"></i></div>
+                            <div class="conversation-phone-chat">
+                                <div class="conversation-preview-bubble">
+                                    <h:panelGroup rendered="#{whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'IMAGE'}" layout="block" styleClass="conversation-preview-media"><h:graphicImage value="#{whatsappWorkspace.conversationTemplateMediaPreviewDataUrl}" rendered="#{not empty whatsappWorkspace.conversationTemplateMediaPreviewDataUrl}"/><h:panelGroup rendered="#{empty whatsappWorkspace.conversationTemplateMediaPreviewDataUrl}" layout="block"><i class="pi pi-image"></i><span>Upload the header image</span></h:panelGroup></h:panelGroup>
+                                    <h:panelGroup rendered="#{whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'VIDEO' or whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'DOCUMENT'}" layout="block" styleClass="conversation-preview-media"><i class="pi #{whatsappWorkspace.conversationTemplatePreviewHeaderFormat eq 'VIDEO' ? 'pi-video' : 'pi-file'}"></i><span>#{whatsappWorkspace.conversationTemplatePreviewHeaderFormat} header</span></h:panelGroup>
+                                    <div class="conversation-preview-content"><h:panelGroup rendered="#{not empty whatsappWorkspace.conversationTemplatePreviewHeader}" layout="block" styleClass="conversation-preview-header"><strong>#{whatsappWorkspace.conversationTemplatePreviewHeader}</strong></h:panelGroup><h:outputText value="#{whatsappWorkspace.conversationTemplatePreviewBody}" styleClass="conversation-preview-body"/><h:panelGroup rendered="#{not empty whatsappWorkspace.conversationTemplatePreviewFooter}" layout="block" styleClass="conversation-preview-footer">#{whatsappWorkspace.conversationTemplatePreviewFooter}</h:panelGroup><div class="conversation-preview-time">11:37 <i class="pi pi-check"></i><i class="pi pi-check second-check"></i></div></div>
+                                    <ui:repeat value="#{whatsappWorkspace.conversationTemplatePreviewButtons}" var="buttonLabel"><div class="conversation-preview-button"><i class="pi pi-external-link"></i> #{buttonLabel}</div></ui:repeat>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
+                <f:facet name="footer"><p:commandButton value="Cancel" type="button" onclick="PF('conversationTemplateDialog').hide()" styleClass="ui-button-secondary"/><p:commandButton value="Send template" icon="pi pi-send" actionListener="#{whatsappWorkspace.sendTemplateToConversation}" process=":conversationForm:conversationTemplateDialog" update=":conversationForm:thread :conversationForm:conversationTemplateDialog :conversationForm:messages" oncomplete="scrollConversationToBottom()"/></f:facet>
+            </p:dialog>
                 </main>
             </div>
         </h:form>

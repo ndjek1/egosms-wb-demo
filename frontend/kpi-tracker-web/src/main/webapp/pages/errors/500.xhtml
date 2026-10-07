@@ -8,14 +8,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
     </f:facet>
-    <title>KPI Tracker System - Error</title>
+    <title>Something went wrong | egoSms</title>
 </h:head>
 
 <h:body styleClass="exception-body">
 
     <div class="exception-topbar">
-        <h:link outcome="/pages/dashboard/Dashboard.xhtml" styleClass="logo">
-            <p:graphicImage name="images/logo.png" library="california-layout" />
+        <h:link outcome="/pages/whatsapp/ConnectedAccounts.xhtml" styleClass="logo egosms-wordmark">
+            <span class="egosms-wordmark-ego">ego</span><span class="egosms-wordmark-sms">Sms</span>
         </h:link>
     </div>
             
@@ -23,16 +23,17 @@
             
     <div class="exception-panel">
         <p:graphicImage styleClass="exception-icon" name="images/icon-error.png" library="california-layout" />
-        <h1 class="exception-summary">Error Occured</h1>
+        <h1 class="exception-summary">Something went wrong</h1>
         <p class="exception-detail">
-            An error occured, please try again later.<br></br>
-Try to search again or use the Go to Dashboard button below.
+            An error occurred. Please try again later.<br></br>
+            Return to the WhatsApp Center to continue.
         </p>
         <div>
-            <p:button outcome="/pages/dashboard/Dashboard.xhtml" value="Go To Dashboard" />
+            <p:button outcome="/pages/whatsapp/ConnectedAccounts.xhtml" value="Go to WhatsApp Center" />
         </div>
     </div>
     <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="california-layout" />
+    <h:outputStylesheet name="css/egosms-brand.css" library="egosms" />
 </h:body>
 
 </html>

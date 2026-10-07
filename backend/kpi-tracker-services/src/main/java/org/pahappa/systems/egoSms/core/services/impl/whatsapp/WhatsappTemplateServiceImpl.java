@@ -67,9 +67,122 @@ public class WhatsappTemplateServiceImpl implements WhatsappTemplateService {
             String next = text(response.path("paging"), "next");
             path = blank(next) ? null : graphPath(next);
         }
-        return entityManager.createQuery("select t from WhatsappTemplate t where t.connection=:connection and t.recordStatus=:status order by t.dateCreated desc", WhatsappTemplate.class)
+        List<WhatsappTemplate> templates = entityManager.createQuery("select t from WhatsappTemplate t where t.connection=:connection and t.recordStatus=:status order by t.dateCreated desc", WhatsappTemplate.class)
                 .setParameter("connection", connection).setParameter("status", RecordStatus.ACTIVE).getResultList();
+        refreshClickAnalytics(connection, templates);
+        return templates;
     }
+
+    private void refreshClickAnalytics(WhatsappConnection connection, List<WhatsappTemplate> templates) {
+        List<WhatsappTemplate> eligible = new ArrayList<WhatsappTemplate>();
+        for (WhatsappTemplate template : templates) {
+            if (!blank(template.getMetaTemplateId()) && hasUrlButton(template)) eligible.add(template);
+        }
+        for (int offset = 0; offset < eligible.size(); offset += 10) {
+            List<WhatsappTemplate> batch = eligible.subList(offset, Math.min(offset + 10, eligible.size()));
+            try {
+                Map<String,WhatsappTemplate> byMetaId = new LinkedHashMap<String,WhatsappTemplate>();
+                StringBuilder ids = new StringBuilder("[");
+                for (WhatsappTemplate template : batch) {
+                    if (ids.length() > 1) ids.append(',');
+                    ids.append(template.getMetaTemplateId());
+                    byMetaId.put(template.getMetaTemplateId(), template);
+                }
+                ids.append(']');
+                long end = System.currentTimeMillis() / 1000L;
+                long start = end - (7L * 24L * 60L * 60L);
+                String path = "/" + connection.getWabaId() + "/template_analytics"
+                        + "?start=" + start
+                        + "&end=" + end
+                        + "&granularity=DAILY"
+                        + "&template_ids=" + encode(ids.toString())
+                        + "&metric_types=" + encode("[\"CLICKED\"]");
+                JsonNode response = metaGraphClient.get(path, token(connection));
+                JsonNode analytics = response.has("data") ? response.get("data") : response;
+
+                Date refreshedAt = new Date();
+                for (WhatsappTemplate template : batch) {
+                    template.setUrlButtonClicks(0L);
+                    template.setUniqueUrlButtonClicks(0L);
+                    template.setClickAnalyticsUpdatedAt(refreshedAt);
+                    template.setClickAnalyticsError(null);
+                }
+                collectClickMetrics(analytics, null, byMetaId);
+            } catch (RuntimeException exception) {
+                String message = analyticsError(exception);
+                for (WhatsappTemplate template : batch) {
+                    template.setUrlButtonClicks(null);
+                    template.setUniqueUrlButtonClicks(null);
+                    template.setClickAnalyticsUpdatedAt(null);
+                    template.setClickAnalyticsError(message);
+                }
+            }
+        }
+    }
+
+    private String analyticsError(RuntimeException exception) {
+        String message = exception.getMessage();
+        if (blank(message)) message = "Meta did not return template click analytics.";
+        int jsonStart = message.indexOf('{');
+        if (jsonStart >= 0) {
+            try {
+                JsonNode error = mapper.readTree(message.substring(jsonStart)).path("error");
+                String userMessage = text(error, "error_user_msg");
+                if (!blank(userMessage)) message = userMessage;
+                else if (!blank(text(error, "message"))) message = text(error, "message");
+            } catch (Exception ignored) { }
+        }
+        String prefix = "Template analytics unavailable: ";
+        int limit = 1000 - prefix.length();
+        if (message.length() > limit) message = message.substring(0, limit - 3) + "...";
+        return prefix + message;
+    }
+
+    private void collectClickMetrics(JsonNode node, String inheritedTemplateId, Map<String,WhatsappTemplate> templates) {
+        if (node == null || node.isNull()) return;
+        if (node.isArray()) {
+            for (JsonNode child : node) collectClickMetrics(child, inheritedTemplateId, templates);
+            return;
+        }
+        if (!node.isObject()) return;
+
+        String templateId = inheritedTemplateId;
+        String candidate = firstText(node, "template_id", "templateId");
+        if (!blank(candidate) && templates.containsKey(candidate)) templateId = candidate;
+
+        JsonNode clicked = node.has("clicked") ? node.get("clicked") : node.get("clicks");
+        if (!blank(templateId) && clicked != null && clicked.isArray()) {
+            WhatsappTemplate template = templates.get(templateId);
+            if (template != null) {
+                for (JsonNode metric : clicked) {
+                    String type = text(metric, "type");
+                    long value = metricValue(metric);
+                    if ("url_button".equalsIgnoreCase(type)) template.setUrlButtonClicks(safe(template.getUrlButtonClicks()) + value);
+                    if ("unique_url_button".equalsIgnoreCase(type)) template.setUniqueUrlButtonClicks(safe(template.getUniqueUrlButtonClicks()) + value);
+                }
+            }
+        }
+        Iterator<JsonNode> children = node.elements();
+        while (children.hasNext()) collectClickMetrics(children.next(), templateId, templates);
+    }
+
+    private boolean hasUrlButton(WhatsappTemplate template) {
+        if (template == null || blank(template.getComponentsJson())) return false;
+        try {
+            JsonNode components = mapper.readTree(template.getComponentsJson());
+            if (components.isArray()) for (JsonNode component : components) {
+                if (!"BUTTONS".equalsIgnoreCase(text(component, "type"))) continue;
+                JsonNode buttons = component.path("buttons");
+                if (buttons.isArray()) for (JsonNode button : buttons) if ("URL".equalsIgnoreCase(text(button, "type"))) return true;
+            }
+        } catch (Exception ignored) { }
+        return false;
+    }
+
+    private String encode(String value) { try { return URLEncoder.encode(value, "UTF-8"); } catch (Exception e) { throw new IllegalStateException(e); } }
+    private String firstText(JsonNode node, String... fields) { for (String field : fields) { String value=text(node,field); if(!blank(value)) return value; } return null; }
+    private long metricValue(JsonNode metric) { JsonNode value=metric.get("value"); if(value==null)value=metric.get("count"); return value==null||!value.isNumber()?0L:value.asLong(); }
+    private long safe(Long value) { return value==null?0L:value.longValue(); }
 
     @Override
     public String uploadSample(String connectionId,String fileName,String contentType,byte[] content) throws ValidationFailedException,OperationFailedException {

@@ -135,6 +135,8 @@
     margin: 0;
 }
 
+.thread-actions { display: flex; gap: 8px; }
+
 .message-row {
     display: flex;
     margin: 12px 0;

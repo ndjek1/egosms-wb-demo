@@ -12,24 +12,22 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
     </f:facet>
-    <title>Name MIS</title>
+    <title>Sign in | egoSms</title>
 </h:head>
 
-<div class="login-topbar">
-    <h:link outcome="/dashboard" styleClass="logo">
-        <p:graphicImage name="images/logo.png" library="california-layout"/>
-    </h:link>
-</div>
-<p:graphicImage styleClass="login-image" name="images/image-login.png" library="california-layout"/>
-
 <h:body styleClass="login-body #{guestPreferences.inputStyleClass}">
+    <div class="login-topbar">
+        <h:link outcome="/ExternalViews/Login.xhtml" styleClass="logo egosms-wordmark">
+            <span class="egosms-wordmark-ego">ego</span><span class="egosms-wordmark-sms">Sms</span>
+        </h:link>
+    </div>
     <h:form id="loginForm" prependId="false">
         <div class="login-panel ui-fluid">
             <div class="p-grid">
                 <div class="p-col-12 p-lg-12 p-md-12 logo-container">
-                    <span class="login-summary">Sign in to KPI Tracker System</span>
+                    <span class="login-summary">Sign in to egoSms</span>
                     <div class="login-detail">
-                        <span>Welcome, please use the form to sign-in network.</span>
+                        <span>Manage WhatsApp accounts, templates and customer conversations.</span>
                     </div>
                 </div>
                 <div class="p-col-12 p-lg-12 p-md-12">
@@ -49,15 +47,12 @@
                 <div class="p-col-12 p-lg-12 p-md-12 chkbox-container">
                     <p:selectBooleanCheckbox id="remember-me"/>
                     <p:outputLabel for="remember-me" value="Remember Me"/>
-                    <a href="#">Reset Password</a>
                 </div>
                 <div class="p-col-12 p-lg-12 p-md-12 button-container" style="text-align: right">
                     <p:commandButton id="login" value="Login" ajax="false"
                                      styleClass="ui-button-raised ui-button-info"
                                      validateClient="true" update="loginForm"
                                      action="#{loginController.doLogin}"/>
-                </div>
-                <div class="p-col-12 p-lg-12 p-md-12 button-container" style="text-align: center">
                 </div>
             </div>
         </div>
@@ -66,6 +61,7 @@
     <h:outputStylesheet name="css/primeicons.css" library="california-layout"/>
     <h:outputStylesheet name="css/primeflex.min.css" library="california-layout"/>
     <h:outputStylesheet name="css/layout-#{guestPreferences.theme}.css" library="california-layout"/>
+    <h:outputStylesheet name="css/egosms-brand.css" library="egosms"/>
 </h:body>
 
 </html>

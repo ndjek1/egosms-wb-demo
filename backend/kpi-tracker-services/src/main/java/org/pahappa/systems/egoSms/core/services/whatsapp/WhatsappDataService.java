@@ -3,6 +3,7 @@ import org.pahappa.systems.egoSms.models.whatsapp.*;
 import org.sers.webutils.model.exception.OperationFailedException;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 public interface WhatsappDataService{
  List<WhatsappTemplate> getTemplates(String connectionId)throws OperationFailedException;
  List<WhatsappConversation> getConversations(String connectionId)throws OperationFailedException;
@@ -12,5 +13,6 @@ public interface WhatsappDataService{
  void markConversationRead(String conversationId)throws OperationFailedException;
  WhatsappConversation findOrCreateConversation(WhatsappConnection connection,String number,String name);
  WhatsappMessage saveInbound(WhatsappConnection connection,String number,String name,String metaMessageId,String body);
+ WhatsappMessage saveOutboundEcho(WhatsappConnection connection,String number,String metaMessageId,String body,Date sentAt);
  void updateMessageStatus(String metaMessageId,WhatsappEnums.MessageStatus status,String details);
 }
