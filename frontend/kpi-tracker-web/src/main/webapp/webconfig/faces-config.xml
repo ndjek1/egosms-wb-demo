@@ -6,6 +6,10 @@
 
 	<name>primefaces_california</name>
 
+	<factory>
+		<exception-handler-factory>org.pahappa.systems.egoSms.views.exceptions.ViewExpiredExceptionHandlerFactory</exception-handler-factory>
+	</factory>
+
 	<component>
 		<component-type>org.primefaces.component.CaliforniaMenu</component-type>
 		<component-class>org.primefaces.california.component.CaliforniaMenu</component-class>

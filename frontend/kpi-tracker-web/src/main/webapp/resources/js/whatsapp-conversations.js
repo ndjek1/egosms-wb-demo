@@ -7,6 +7,24 @@
     };
     var notificationConnection = null;
     var lastInboundMessageId = null;
+    var recoveryInProgress = false;
+
+    window.recoverExpiredConversationView = function (xhr, status) {
+        if (recoveryInProgress) {
+            return;
+        }
+
+        var response = xhr && xhr.responseText ? xhr.responseText : '';
+        var expired = (xhr && (xhr.status === 500 || xhr.status === 401 || xhr.status === 403))
+            || status === 'parsererror'
+            || response.indexOf('ViewExpiredException') !== -1
+            || response.indexOf('could not be restored') !== -1;
+
+        if (expired) {
+            recoveryInProgress = true;
+            window.location.reload();
+        }
+    };
 
     function contactList() {
         return document.querySelector('.conversation-list-scroll');

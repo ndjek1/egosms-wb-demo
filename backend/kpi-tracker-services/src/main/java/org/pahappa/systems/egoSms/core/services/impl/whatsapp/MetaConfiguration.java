@@ -3,6 +3,7 @@ package org.pahappa.systems.egoSms.core.services.impl.whatsapp;
 import org.springframework.stereotype.Component;
 import java.io.*;
 import java.net.URI;
+import java.math.BigDecimal;
 import java.util.*;
 
 @Component
@@ -19,6 +20,9 @@ public class MetaConfiguration {
     public String version(){return value("META_API_VERSION",value("META_GRAPH_VERSION","v23.0"));}
     public String appId(){return required("META_APP_ID");} public String appSecret(){return required("META_APP_SECRET");} public String signupConfigId(){return required("META_EMBEDDED_SIGNUP_CONFIG_ID");}
     public String registrationPin(){return required("META_REGISTRATION_PIN");} public String encryptionKey(){return required("META_TOKEN_ENCRYPTION_KEY");} public String webhookVerifyToken(){return required("META_WEBHOOK_VERIFY_TOKEN");}
+    public boolean serviceFeeBillingEnabled(){return Boolean.parseBoolean(value("EGOSMS_SERVICE_FEE_BILLING_ENABLED","false"));}
+    public String serviceFeeCurrency(){return value("EGOSMS_SERVICE_FEE_CURRENCY","UGX").toUpperCase(Locale.ENGLISH);}
+    public BigDecimal monthlySubscriptionFee(){try{return new BigDecimal(value("EGOSMS_MONTHLY_SUBSCRIPTION_FEE","0"));}catch(NumberFormatException e){throw new IllegalStateException("EGOSMS_MONTHLY_SUBSCRIPTION_FEE must be a valid decimal number",e);}}
     public String loadedFile(){return loadedFile;}
     private boolean walkForEnv(File start){File directory=start!=null&&start.isFile()?start.getParentFile():start;for(int i=0;i<14&&directory!=null;i++,directory=directory.getParentFile())if(loadIfPresent(new File(directory,".env")))return true;return false;}
     private boolean loadIfPresent(File file){if(file==null||!file.isFile())return false;load(file);loadedFile=file.getAbsolutePath();return true;}

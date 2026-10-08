@@ -25,8 +25,11 @@ public class CustomMigrationService extends MigrationTemplate {
     @Autowired
     CustomPermissionRoleMigrations permissionRoleMigrations;
 
+    @Autowired
+    BillingSchemaMigrations billingSchemaMigrations;
+
     private final List<Class<?>> migrationClasses = Arrays
-            .asList(new Class<?>[]{CustomPermissionRoleMigrations.class});
+            .asList(new Class<?>[]{CustomPermissionRoleMigrations.class, BillingSchemaMigrations.class});
 
     public static boolean EXECUTED_MIGRATIONS = false;
 

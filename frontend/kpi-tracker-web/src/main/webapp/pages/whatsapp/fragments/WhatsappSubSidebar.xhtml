@@ -41,6 +41,12 @@
                     #{whatsappWorkspace.totalUnreadCount}
                 </h:panelGroup>
             </a>
+
+            <a href="#{request.contextPath}/pages/whatsapp/Billing.xhtml"
+               class="whatsapp-sub-link #{whatsappSection eq 'billing' ? 'active' : ''}">
+                <i class="pi pi-wallet"></i>
+                <span>Billing</span>
+            </a>
         </nav>
     </aside>
 </ui:composition>

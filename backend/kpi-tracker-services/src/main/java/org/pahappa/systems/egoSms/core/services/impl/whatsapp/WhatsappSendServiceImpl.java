@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.pahappa.systems.egoSms.core.services.whatsapp.WhatsappConnectionService;
 import org.pahappa.systems.egoSms.core.services.whatsapp.WhatsappDataService;
 import org.pahappa.systems.egoSms.core.services.whatsapp.WhatsappSendService;
+import org.pahappa.systems.egoSms.core.services.billing.ServiceFeeBillingService;
 import org.pahappa.systems.egoSms.models.whatsapp.*;
 import org.sers.webutils.model.RecordStatus;
 import org.sers.webutils.model.exception.OperationFailedException;
@@ -25,6 +26,7 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
     @Autowired private WhatsappDataService dataService;
     @Autowired private TokenEncryptionService tokenEncryptionService;
     @Autowired private MetaGraphClient metaGraphClient;
+    @Autowired private ServiceFeeBillingService serviceFeeBillingService;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -66,7 +68,8 @@ public class WhatsappSendServiceImpl implements WhatsappSendService {
         WhatsappMessage message = new WhatsappMessage();
         message.setConversation(conversation); message.setTemplate(template); message.setDirection(WhatsappEnums.Direction.OUTBOUND);
         message.setBody(storedBody); message.setRenderedHeader(renderedHeader(template, request)); message.setMetaMessageId(metaMessageId); message.setMessageStatus(WhatsappEnums.MessageStatus.SENT);
-        message.setSentAt(new Date()); message.setRecordStatus(RecordStatus.ACTIVE); entityManager.persist(message);
+        message.setSentAt(new Date()); message.setRecordStatus(RecordStatus.ACTIVE); entityManager.persist(message); entityManager.flush();
+        serviceFeeBillingService.ensureCurrentMonthlySubscription(connection);
         return message;
     }
 

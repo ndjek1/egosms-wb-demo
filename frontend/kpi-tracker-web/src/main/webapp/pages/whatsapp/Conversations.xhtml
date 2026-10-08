@@ -26,6 +26,7 @@
                     update=":conversationForm:conversationList :conversationForm:messageStream :conversationForm:notificationState"
                     onstart="rememberConversationScrollPositions()"
                     oncomplete="restoreConversationScrollPositions(); checkForNewWhatsappMessage()"
+                    onerror="recoverExpiredConversationView(xhr, status, error)"
                     stop="#{empty whatsappWorkspace.connectionId}"/>
 
             <div class="whatsapp-workspace-layout">

@@ -1,0 +1,21 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/pages/californiatemplate/template.xhtml">
+ <ui:define name="title">Billing Management</ui:define><ui:define name="viewname">Settings / Billing</ui:define>
+ <ui:define name="head"><style type="text/css">.billing-admin-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem}.billing-admin-heading h2{margin:0 0 .35rem}.billing-admin-heading p{margin:0;color:#65756f}.billing-help{padding:1rem;margin-bottom:1rem;border-left:4px solid #168a57;border-radius:6px;background:#eef9f4;color:#285e49}.billing-account small{display:block;color:#73817c;margin-top:.2rem}.billing-cell-field{width:100%}.billing-save{min-width:100px}@media(max-width:700px){.billing-admin-heading{align-items:stretch;flex-direction:column}}</style></ui:define>
+ <ui:define name="content"><h:form id="billingAdminForm"><p:growl id="messages" showDetail="true"/>
+  <ui:fragment rendered="#{componentRenderer.administrator}">
+   <div class="card billing-admin-heading"><div><h2>Account billing</h2><p>Set the egoSms monthly subscription separately for each connected WhatsApp account.</p></div><p:commandButton value="Refresh accounts" icon="pi pi-refresh" actionListener="#{billingAdmin.refresh}" update="subscriptions messages"/></div>
+   <h:panelGroup rendered="#{not billingAdmin.billingEnabled}" layout="block" styleClass="ui-message-warn" style="padding:1rem;margin-bottom:1rem">Billing is globally disabled. You can prepare account rates here, but monthly charges will not be generated until <strong>EGOSMS_SERVICE_FEE_BILLING_ENABLED=true</strong>.</h:panelGroup>
+   <div class="billing-help"><strong>Meta billing remains separate.</strong> These settings control only egoSms subscription charges. Clients still pay Meta directly for WhatsApp messaging usage.</div>
+   <h:panelGroup id="subscriptions" layout="block"><div class="card"><p:dataTable value="#{billingAdmin.subscriptions}" var="subscription" reflow="true" paginator="true" rows="20" emptyMessage="No WhatsApp accounts are available for billing.">
+    <p:column headerText="Client"><div class="billing-account"><strong>#{subscription.client.emailAddress}</strong><small>#{subscription.client.username}</small></div></p:column>
+    <p:column headerText="WhatsApp account"><div class="billing-account"><strong>#{empty subscription.connection.verifiedName ? 'WhatsApp account' : subscription.connection.verifiedName}</strong><small>#{subscription.connection.displayPhoneNumber}</small><small>WABA: #{subscription.connection.wabaId}</small></div></p:column>
+    <p:column headerText="Currency" style="width:120px"><p:inputText id="currency" value="#{subscription.currency}" maxlength="3" styleClass="billing-cell-field"/></p:column>
+    <p:column headerText="Monthly fee" style="width:170px"><p:inputText id="monthlyFee" value="#{subscription.monthlyFee}" styleClass="billing-cell-field"><f:convertNumber maxFractionDigits="4"/></p:inputText></p:column>
+    <p:column headerText="Billing status" style="width:160px"><p:selectOneMenu id="billingStatus" value="#{subscription.status}" styleClass="billing-cell-field"><f:selectItem itemLabel="Active" itemValue="ACTIVE"/><f:selectItem itemLabel="Suspended" itemValue="SUSPENDED"/></p:selectOneMenu></p:column>
+    <p:column headerText="Updated" style="width:150px"><h:outputText value="#{subscription.updatedAt}"><f:convertDateTime pattern="dd MMM yyyy HH:mm"/></h:outputText></p:column>
+    <p:column headerText="Action" style="width:125px;text-align:center"><p:commandButton value="Save" icon="pi pi-check" actionListener="#{billingAdmin.save(subscription)}" process="@this currency monthlyFee billingStatus" update=":billingAdminForm:subscriptions :billingAdminForm:messages" styleClass="billing-save"/></p:column>
+   </p:dataTable></div></h:panelGroup>
+  </ui:fragment>
+  <h:panelGroup rendered="#{not componentRenderer.administrator}" layout="block" styleClass="card"><h2>Access denied</h2><p>Administrator privileges are required to manage billing.</p></h:panelGroup>
+ </h:form></ui:define>
+</ui:composition>

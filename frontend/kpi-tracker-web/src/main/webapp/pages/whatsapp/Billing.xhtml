@@ -1,0 +1,23 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/pages/californiatemplate/template.xhtml">
+ <ui:define name="title">egoSms Billing</ui:define><ui:define name="viewname">WhatsApp / Billing</ui:define>
+ <ui:define name="head"><h:outputStylesheet library="css" name="whatsapp-workspace.css"/><h:outputStylesheet library="css" name="whatsapp-billing.css"/></ui:define>
+ <ui:define name="content"><h:form id="billingForm"><div class="whatsapp-workspace-layout">
+  <ui:include src="./fragments/WhatsappSubSidebar.xhtml"><ui:param name="whatsappSection" value="billing"/></ui:include>
+  <main class="whatsapp-workspace-main">
+   <div class="card billing-heading"><div><h2>egoSms service fees</h2><p>Meta bills your WhatsApp Business Account directly. This ledger contains only fees charged by egoSms.</p></div><p:commandButton value="Refresh" icon="pi pi-refresh" actionListener="#{serviceFeeBilling.refresh}" update="@form"/></div>
+   <div class="billing-notice"><i class="pi pi-info-circle"></i><div><strong>Separate billing</strong><br/>WhatsApp messaging charges, taxes and payment methods remain in Meta WhatsApp Manager and are not included below.</div></div>
+   <div class="billing-summary-grid">
+    <div class="card billing-summary"><span>Subscription charges</span><strong>#{serviceFeeBilling.currency} <h:outputText value="#{serviceFeeBilling.total}"><f:convertNumber minFractionDigits="2" maxFractionDigits="4"/></h:outputText></strong></div>
+    <div class="card billing-summary"><span>Billed months</span><strong>#{serviceFeeBilling.chargeCount}</strong></div>
+    <div class="card billing-summary"><span>Current monthly subscriptions</span><strong>#{serviceFeeBilling.currency} <h:outputText value="#{serviceFeeBilling.monthlyFee}"><f:convertNumber minFractionDigits="2" maxFractionDigits="4"/></h:outputText></strong><small>total across active WhatsApp accounts</small></div>
+   </div>
+   <h:panelGroup rendered="#{not serviceFeeBilling.enabled}" layout="block" styleClass="billing-disabled">Service-fee billing is currently disabled. No new egoSms fees will be recorded.</h:panelGroup>
+   <div class="card"><h3>Service-fee ledger</h3><p:dataTable value="#{serviceFeeBilling.charges}" var="charge" reflow="true" paginator="true" rows="20" emptyMessage="No egoSms service fees have been recorded yet.">
+    <p:column headerText="Date"><h:outputText value="#{charge.chargedAt}"><f:convertDateTime pattern="dd MMM yyyy HH:mm"/></h:outputText></p:column>
+    <p:column headerText="WhatsApp account"><strong>#{empty charge.connection.verifiedName ? 'WhatsApp account' : charge.connection.verifiedName}</strong><br/><small>#{charge.connection.displayPhoneNumber}</small></p:column><p:column headerText="Billing period"><strong>#{charge.billingPeriod}</strong></p:column>
+    <p:column headerText="Description">#{charge.description}</p:column><p:column headerText="Status"><span class="billing-status">#{charge.status}</span></p:column>
+    <p:column headerText="Amount" style="text-align:right"><strong>#{charge.currency} <h:outputText value="#{charge.amount}"><f:convertNumber minFractionDigits="2" maxFractionDigits="4"/></h:outputText></strong></p:column>
+   </p:dataTable></div>
+  </main>
+ </div></h:form></ui:define>
+</ui:composition>

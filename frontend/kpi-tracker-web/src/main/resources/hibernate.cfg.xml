@@ -48,6 +48,8 @@
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappConversationRead" />
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappMessage" />
 		<mapping class="org.pahappa.systems.egoSms.models.whatsapp.WhatsappTemplate" />
+		<mapping class="org.pahappa.systems.egoSms.models.billing.ServiceFeeCharge" />
+		<mapping class="org.pahappa.systems.egoSms.models.billing.ServiceFeeSubscription" />
 		
 	</session-factory>
 </hibernate-configuration>
