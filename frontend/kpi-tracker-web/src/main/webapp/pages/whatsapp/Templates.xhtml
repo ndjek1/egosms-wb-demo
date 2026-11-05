@@ -105,7 +105,9 @@
 
                                 <div class="template-status">
                                     <span>
-                                        <i class="pi #{template.approvalStatus eq 'APPROVED' ? 'pi-check-circle' : (template.approvalStatus eq 'REJECTED' ? 'pi-exclamation-triangle' : 'pi-clock')}"></i>
+
+                                        <i class="pi #{template.approvalStatus eq 'APPROVED' ? 'pi-check-circle' : (template.approvalStatus eq 'REJECTED' ? 'pi-exclamation-triangle' : 'pi-clock')}">
+                                        </i>
                                         #{template.approvalStatus}
                                     </span>
                                     <span>#{template.language}</span>
@@ -116,7 +118,9 @@
                                         layout="block"
                                         styleClass="template-media">
                                     <div>
-                                        <i class="pi #{whatsappWorkspace.templateHeaderFormat(template) eq 'IMAGE' ? 'pi-image' : (whatsappWorkspace.templateHeaderFormat(template) eq 'VIDEO' ? 'pi-video' : 'pi-file')}"></i>
+
+                                        <i class="pi #{whatsappWorkspace.templateHeaderFormat(template) eq 'IMAGE' ? 'pi-image' : (whatsappWorkspace.templateHeaderFormat(template) eq 'VIDEO' ? 'pi-video' : 'pi-file')}">
+                                        </i>
                                         #{whatsappWorkspace.templateHeaderFormat(template)} header
                                     </div>
                                 </h:panelGroup>
@@ -161,6 +165,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup rendered="#{empty template.clickAnalyticsUpdatedAt}" layout="block" styleClass="template-click-unavailable">
                                         <i class="pi pi-info-circle"></i>
+
                                         <h:outputText value="#{empty template.clickAnalyticsError ? 'Click statistics have not been synchronized yet.' : template.clickAnalyticsError}"/>
                                     </h:panelGroup>
                                 </h:panelGroup>

@@ -6,6 +6,9 @@ import org.sers.webutils.model.exception.OperationFailedException;
 import org.sers.webutils.model.exception.ValidationFailedException;
 
 public interface WhatsappSendService {
-    WhatsappMessage send(WhatsappSendRequest request) throws ValidationFailedException, OperationFailedException;
-    String uploadHeaderMedia(String connectionId, String fileName, String contentType, byte[] content) throws ValidationFailedException, OperationFailedException;
+  WhatsappMessage send(WhatsappSendRequest request)
+      throws ValidationFailedException, OperationFailedException;
+
+  String uploadHeaderMedia(String connectionId, String fileName, String contentType, byte[] content)
+      throws ValidationFailedException, OperationFailedException;
 }

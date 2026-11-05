@@ -47,8 +47,20 @@
 		<property name="url" value="jdbc:mysql://localhost/egosms_wb?createDatabaseIfNotExist=true" />
 		<property name="username" value="root" />
 		<property name="password" value="" />
-		
+
 	</bean>
+
+<!--	SERVER-->
+
+<!--	<bean id="dataSource"-->
+<!--		  class="org.springframework.jdbc.datasource.DriverManagerDataSource">-->
+<!--		<property name="driverClassName"-->
+<!--				  value="com.mysql.jdbc.Driver" />-->
+<!--		<property name="url" value="jdbc:mysql://localhost/egosms_wb?createDatabaseIfNotExist=true" />-->
+<!--		<property name="username" value="ego_wb_app" />-->
+<!--		<property name="password" value="RandomPassword@" />-->
+
+<!--	</bean>-->
 	
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">

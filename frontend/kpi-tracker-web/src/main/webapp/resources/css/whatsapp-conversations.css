@@ -235,6 +235,33 @@
     border-top: 1px solid #e6ebef;
 }
 
+.ai-assistant-dialog .ui-dialog-content { padding: 0; }
+.ai-assistant-panel { padding: 20px; }
+.ai-assistant-notice {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid #cfe4da;
+    border-radius: 8px;
+    background: #f2faf6;
+    color: #38584b;
+    line-height: 1.45;
+}
+.ai-assistant-notice i { margin-top: 3px; color: #168a57; }
+.ai-assistant-actions { display: flex; gap: 10px; margin-top: 16px; }
+.ai-assistant-result { display: block; margin-top: 18px; }
+.ai-assistant-result > label { display: block; margin-bottom: 7px; color: #25313c; font-weight: 700; }
+.ai-assistant-result .ui-inputtextarea { margin-bottom: 10px; }
+.ai-assistant-summary {
+    padding: 14px;
+    border: 1px solid #e0e7e3;
+    border-radius: 8px;
+    background: #fbfcfb;
+    color: #34443d;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
 @media (max-width: 850px) {
     .conversation-layout { grid-template-columns: 1fr; }
     .conversation-list-card {

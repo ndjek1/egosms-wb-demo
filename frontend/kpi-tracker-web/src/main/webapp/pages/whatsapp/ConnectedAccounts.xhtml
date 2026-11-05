@@ -29,7 +29,8 @@
                     </div>
                     <div class="ui-g-12 ui-md-5 connect-account-actions">
                         <p:commandButton type="button" id="connectWhatsapp" value="Connect new number" icon="pi pi-plus" styleClass="ui-button-success"/>
-<!--                        <p:commandButton type="button" id="connectExistingWhatsapp" value="Connect existing app number" icon="pi pi-mobile" styleClass="ui-button-outlined"/>-->
+
+                        <p:commandButton type="button" id="connectExistingWhatsapp" value="Connect existing app number" icon="pi pi-mobile" styleClass="ui-button-outlined"/>
                     </div>
                 </div>
                 <div id="signupConfiguration"
@@ -51,8 +52,26 @@
                             <br/><small>Phone number ID: #{account.phoneNumberId}</small>
                         </p:column>
                         <p:column headerText="WABA ID">#{account.wabaId}</p:column>
-                        <p:column headerText="Status"><span class="connection-status #{account.connectionStatus eq 'CONNECTED' ? 'connected' : 'disconnected'}">#{account.connectionStatus}</span></p:column>
-                        <p:column headerText="Connected/updated"><h:outputText value="#{account.updatedAt}"><f:convertDateTime pattern="dd MMM yyyy HH:mm"/></h:outputText></p:column>
+
+                        <p:column headerText="Status">
+                        <span class="connection-status #{account.connectionStatus eq 'CONNECTED' ? 'connected' : 'disconnected'}">#{account.connectionStatus}
+                        </span>
+                        </p:column>
+
+                        <p:column headerText="Connected/updated">
+                        <h:outputText value="#{account.updatedAt}">
+                        <f:convertDateTime pattern="dd MMM yyyy HH:mm"/>
+                        </h:outputText>
+                        </p:column>
+                        <p:column headerText="AI auto-reply" style="width:150px;text-align:center">
+                            <p:selectBooleanCheckbox value="#{account.aiAutoReplyEnabled}" disabled="#{account.connectionStatus ne 'CONNECTED'}">
+
+                                <p:ajax listener="#{whatsappWorkspace.updateAiAutoReply(account)}" process="@this" update=":accountsForm:accountsPanel :accountsForm:messages"/>
+                            </p:selectBooleanCheckbox>
+                            <br/><small>Greetings and approved business answers</small>
+
+                            <p:commandButton value="Business info" icon="pi pi-pencil" actionListener="#{whatsappWorkspace.openAiKnowledge(account)}" process="@this" update=":accountsForm:aiKnowledgeFields" oncomplete="PF('aiKnowledgeDialog').show()" styleClass="ui-button-flat ui-button-sm"/>
+                        </p:column>
                         <p:column headerText="Actions" style="width:145px;text-align:center">
                             <p:commandButton
                                     value="Disconnect"
@@ -76,6 +95,24 @@
                 </div>
             </h:panelGroup>
 
+            <p:dialog id="aiKnowledgeDialog" widgetVar="aiKnowledgeDialog" header="AI business information" modal="true" responsive="true" width="720">
+                <h:panelGroup id="aiKnowledgeFields" layout="block">
+
+                    <p>Tell the assistant what this business does and which answers it is allowed to give. Importing a public page also follows a limited number of links on the same site, then lets you review the combined text before saving. Do not include passwords, access tokens, OTPs, or private customer data.
+                    </p>
+                    <p:inputText value="#{whatsappWorkspace.aiBusinessSourceUrl}" placeholder="https://example.com/faq" style="width:78%"/>
+
+                    <p:commandButton value="Import page" icon="pi pi-download" actionListener="#{whatsappWorkspace.importAiKnowledge}" process="@this :accountsForm:aiKnowledgeFields" update=":accountsForm:aiKnowledgeFields :accountsForm:messages" styleClass="ui-button-outlined"/>
+
+                    <p:inputTextarea value="#{whatsappWorkspace.aiBusinessContext}" rows="12" maxlength="12000" autoResize="false" style="width:100%" placeholder="Example: We are a courier company in Kampala. We deliver parcels within Uganda. Our support team is available Monday to Friday, 8am–5pm EAT. For prices, refunds, and delivery status, always hand off to an agent."/>
+                </h:panelGroup>
+                <f:facet name="footer">
+                    <p:commandButton value="Cancel" type="button" styleClass="ui-button-secondary" onclick="PF('aiKnowledgeDialog').hide()"/>
+
+                    <p:commandButton value="Save business information" icon="pi pi-check" actionListener="#{whatsappWorkspace.saveAiKnowledge}" process="@this :accountsForm:aiKnowledgeFields" update=":accountsForm:accountsPanel :accountsForm:messages"/>
+                </f:facet>
+            </p:dialog>
+
             <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true">
                 <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
                 <p:commandButton value="Yes, disconnect" type="button" styleClass="ui-confirmdialog-yes ui-button-danger"/>
@@ -85,7 +122,11 @@
                 <h3>What happens when you connect an account?</h3>
                 <ol style="line-height:1.8">
                     <li>For a new number, Meta asks the client to select or create their business portfolio, WABA and phone number.</li>
-                    <li>For an existing WhatsApp Business app number, choose <strong>Connect existing app number</strong>. The client confirms the number in Meta and keeps using the mobile app.</li>
+
+                    <li>For an existing WhatsApp Business app number, choose
+                    <strong>Connect existing app number
+                    </strong>. The client confirms the number in Meta and keeps using the mobile app.
+                    </li>
                     <li>egoSms securely exchanges the one-time authorization code on the server.</li>
                     <li>The WABA is subscribed to this app's webhooks. New Cloud API numbers are registered; coexistence numbers are not re-registered.</li>
                     <li>For coexistence, Meta synchronizes contacts and eligible message history only when the client approves those options.</li>

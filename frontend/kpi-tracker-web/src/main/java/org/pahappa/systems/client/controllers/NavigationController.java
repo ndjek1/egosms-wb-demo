@@ -1,81 +1,78 @@
 package org.pahappa.systems.client.controllers;
 
 import java.io.Serializable;
-
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-
 import org.pahappa.systems.egoSms.security.HyperLinks;
 
 /**
  * Central place for URLs to xhtml pages.
- * <p>
- * Restrict the name of the bean, in case the name of the class is changed,
- * references to the class can still access the right bean.
- * <p>
- * Its application scoped to ensure that only one instance of the bean exists in
- * the entire life cycle of the application.
+ *
+ * <p>Restrict the name of the bean, in case the name of the class is changed, references to the
+ * class can still access the right bean.
+ *
+ * <p>Its application scoped to ensure that only one instance of the bean exists in the entire life
+ * cycle of the application.
  */
 @ManagedBean(name = "navigationController")
 @ApplicationScoped
 public class NavigationController implements Serializable {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 1L;
-    private String userForm = HyperLinks.USER_FORM;
-    private String rolesView = HyperLinks.ROLES_VIEW;
-    private String profileView = HyperLinks.PROFILE_VIEW;
-    private String mailSettingForm = HyperLinks.MAIL_SETTING_FORM;
-    private String loginForm = HyperLinks.LOGIN_FORM;
-    private String homePage = HyperLinks.DASHBOARD;
+  /** */
+  private static final long serialVersionUID = 1L;
 
-    public String getUserForm() {
-        return userForm;
-    }
+  private String userForm = HyperLinks.USER_FORM;
+  private String rolesView = HyperLinks.ROLES_VIEW;
+  private String profileView = HyperLinks.PROFILE_VIEW;
+  private String mailSettingForm = HyperLinks.MAIL_SETTING_FORM;
+  private String loginForm = HyperLinks.LOGIN_FORM;
+  private String homePage = HyperLinks.DASHBOARD;
 
-    public String getRolesView() {
-        return rolesView;
-    }
+  public String getUserForm() {
+    return userForm;
+  }
 
-    public String getProfileView() {
-        return profileView;
-    }
+  public String getRolesView() {
+    return rolesView;
+  }
 
-    public String getMailSettingForm() {
-        return mailSettingForm;
-    }
+  public String getProfileView() {
+    return profileView;
+  }
 
-    public String getLoginForm() {
-        return loginForm;
-    }
+  public String getMailSettingForm() {
+    return mailSettingForm;
+  }
 
-    public void setUserForm(String userForm) {
-        this.userForm = userForm;
-    }
+  public String getLoginForm() {
+    return loginForm;
+  }
 
-    public void setRolesView(String rolesView) {
-        this.rolesView = rolesView;
-    }
+  public void setUserForm(String userForm) {
+    this.userForm = userForm;
+  }
 
-    public void setProfileView(String profileView) {
-        this.profileView = profileView;
-    }
+  public void setRolesView(String rolesView) {
+    this.rolesView = rolesView;
+  }
 
-    public void setMailSettingForm(String mailSettingForm) {
-        this.mailSettingForm = mailSettingForm;
-    }
+  public void setProfileView(String profileView) {
+    this.profileView = profileView;
+  }
 
-    public void setLoginForm(String loginForm) {
-        this.loginForm = loginForm;
-    }
+  public void setMailSettingForm(String mailSettingForm) {
+    this.mailSettingForm = mailSettingForm;
+  }
 
-    public String getHomePage() {
-        return homePage;
-    }
+  public void setLoginForm(String loginForm) {
+    this.loginForm = loginForm;
+  }
 
-    public void setHomePage(String homePage) {
-        this.homePage = homePage;
-    }
+  public String getHomePage() {
+    return homePage;
+  }
+
+  public void setHomePage(String homePage) {
+    this.homePage = homePage;
+  }
 }

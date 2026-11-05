@@ -9,8 +9,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SystemRole {
 
-	String name();
+  String name();
 
-	String description() default "Not supplied";
-
+  String description() default "Not supplied";
 }

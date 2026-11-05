@@ -1,0 +1,91 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core" template="/pages/californiatemplate/template.xhtml">
+ <ui:define name="title">WhatsApp Billing</ui:define><ui:define name="viewname">WhatsApp / Billing</ui:define>
+
+ <ui:define name="head">
+ <h:outputStylesheet library="css" name="whatsapp-workspace.css"/>
+ <h:outputStylesheet library="css" name="whatsapp-billing.css"/>
+ </ui:define>
+
+ <ui:define name="content">
+ <div class="whatsapp-workspace-layout">
+ <ui:include src="./fragments/WhatsappSubSidebar.xhtml">
+ <ui:param name="whatsappSection" value="billing"/>
+ </ui:include>
+ <main class="whatsapp-workspace-main">
+
+  <section class="card billing-hero">
+  <div>
+  <span class="billing-eyebrow">SIMULATION
+  </span>
+  <h1>Billing
+  </h1>
+  <p>egoSms estimates the Meta messaging cost, adds the configured service charge, and presents one monthly invoice.
+  </p>
+  </div>
+  <span class="billing-model">
+  <i class="pi pi-wallet"/> egoSms pays Meta
+  </span>
+  </section>
+
+  <h:form id="billingForm">
+  <p:growl id="messages" showDetail="true"/>
+  <section class="card">
+  <h2>Your billing accounts
+  </h2>
+  <p:dataTable value="#{billingView.accounts}" var="a" emptyMessage="Connect a WhatsApp account to begin billing.">
+  <p:column headerText="Account">
+  <strong>#{empty a.connection.verifiedName ? 'WhatsApp account' : a.connection.verifiedName}
+  </strong>
+  <br/>
+  <small>#{a.connection.displayPhoneNumber}
+  </small>
+  </p:column>
+  <p:column headerText="Monthly fee">#{a.currency}
+  <h:outputText value="#{a.monthlyFee}">
+  <f:convertNumber minFractionDigits="2" maxFractionDigits="2"/>
+  </h:outputText>
+  </p:column>
+  <p:column headerText="Estimated Meta rate">#{a.currency} #{a.estimatedMetaCostPerMessage} / outbound message
+  </p:column>
+  <p:column headerText="Markup">#{a.markupPercent}%
+  </p:column>
+  <p:column headerText="Status">
+  <span class="billing-status #{a.suspended ? 'suspended' : 'active'}">#{a.accountStatus}
+  </span>
+  </p:column>
+  </p:dataTable>
+  </section>
+
+  <section class="card">
+  <h2>Monthly invoices
+  </h2>
+  <p class="billing-note">These amounts are simulated. Service replies and utility templates sent inside an open 24-hour customer-service window are not included in chargeable messages.
+  </p>
+  <p:dataTable value="#{billingView.invoices}" var="i" emptyMessage="No invoices have been generated yet.">
+  <p:column headerText="Period">#{i.periodKey}
+  </p:column>
+  <p:column headerText="Account">#{i.billingAccount.connection.verifiedName}
+  <br/>
+  <small>#{i.billingAccount.connection.displayPhoneNumber}
+  </small>
+  </p:column>
+  <p:column headerText="Chargeable messages">#{i.messageCount}
+  </p:column>
+  <p:column headerText="Meta estimate">#{i.billingAccount.currency} #{i.estimatedMetaCost}
+  </p:column>
+  <p:column headerText="egoSms charges">#{i.billingAccount.currency} #{i.monthlyFee + i.markupAmount}
+  </p:column>
+  <p:column headerText="Total">
+  <strong>#{i.billingAccount.currency} #{i.totalAmount}
+  </strong>
+  </p:column>
+  <p:column headerText="Status">
+  <span class="billing-status #{i.invoiceStatus eq 'PAID' ? 'paid' : 'open'}">#{i.invoiceStatus}
+  </span>
+  </p:column>
+  </p:dataTable>
+  </section>
+  </h:form>
+ </main></div></ui:define>
+</ui:composition>

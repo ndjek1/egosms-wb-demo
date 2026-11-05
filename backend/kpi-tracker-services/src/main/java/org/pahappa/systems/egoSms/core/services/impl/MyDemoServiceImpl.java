@@ -12,14 +12,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MyDemoServiceImpl extends GenericServiceImpl<MyDemo> implements MyDemoService {
 
-    @Override
-    public MyDemo saveInstance(MyDemo entityInstance) throws ValidationFailedException, OperationFailedException {
-        Validate.notNull(entityInstance, "Missing details");
-        return save(entityInstance);
-    }
+  @Override
+  public MyDemo saveInstance(MyDemo entityInstance)
+      throws ValidationFailedException, OperationFailedException {
+    Validate.notNull(entityInstance, "Missing details");
+    return save(entityInstance);
+  }
 
-    @Override
-    public boolean isDeletable(MyDemo instance) throws OperationFailedException {
-        return true;
-    }
+  @Override
+  public boolean isDeletable(MyDemo instance) throws OperationFailedException {
+    return true;
+  }
 }

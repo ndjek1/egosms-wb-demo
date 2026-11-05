@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/pages/californiatemplate/template.xhtml">
+
+    <ui:define name="title">Billing administration</ui:define>
+    <ui:define name="viewname">Settings / Billing</ui:define>
+    <ui:define name="head">
+        <h:outputStylesheet library="css" name="whatsapp-billing.css"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="adminBillingForm">
+            <p:growl id="messages" showDetail="true"/>
+            <ui:fragment rendered="#{componentRenderer.administrator}">
+                <section class="card billing-hero">
+                    <div>
+                        <span class="billing-eyebrow">SIMULATION</span>
+                        <h1>Client billing administration</h1>
+                        <p>Configure the estimated cost egoSms pays Meta and the charges billed to each client account.</p>
+                    </div>
+                    <p:commandButton value="Refresh" icon="pi pi-refresh"
+                                     actionListener="#{billingAdminView.refresh}" update="@form"/>
+                </section>
+
+                <section class="card">
+                    <h2>Account rates and access</h2>
+                    <p:dataTable value="#{billingAdminView.accounts}" var="account"
+                                 emptyMessage="No WhatsApp accounts are connected.">
+                        <p:column headerText="Client">
+                            <strong>#{account.connection.owner.emailAddress}</strong><br/>
+                            <small>#{account.connection.verifiedName} · #{account.connection.displayPhoneNumber}</small>
+                        </p:column>
+                        <p:column headerText="Currency">
+                            <p:inputText value="#{account.currency}" maxlength="3" styleClass="billing-small-input"/>
+                        </p:column>
+                        <p:column headerText="Monthly fee">
+                            <p:inputText value="#{account.monthlyFee}" styleClass="billing-rate-input"/>
+                        </p:column>
+                        <p:column headerText="Meta estimate / message">
+                            <p:inputText value="#{account.estimatedMetaCostPerMessage}" styleClass="billing-rate-input"/>
+                        </p:column>
+                        <p:column headerText="Markup %">
+                            <p:inputText value="#{account.markupPercent}" styleClass="billing-rate-input"/>
+                        </p:column>
+                        <p:column headerText="Status">
+                            <span class="billing-status #{account.suspended ? 'suspended' : 'active'}">#{account.accountStatus}</span>
+                        </p:column>
+                        <p:column headerText="Actions" styleClass="billing-actions">
+                            <p:commandButton value="Save" icon="pi pi-check"
+                                             actionListener="#{billingAdminView.save(account)}"
+                                             process="@form" update="@form"/>
+                            <p:commandButton value="Generate invoice" icon="pi pi-file"
+                                             actionListener="#{billingAdminView.generate(account)}"
+                                             process="@this" update="@form"/>
+                            <p:commandButton value="#{account.suspended ? 'Reactivate' : 'Suspend'}"
+                                             icon="#{account.suspended ? 'pi pi-play' : 'pi pi-ban'}"
+                                             styleClass="#{account.suspended ? 'ui-button-success' : 'ui-button-danger'}"
+                                             actionListener="#{billingAdminView.toggle(account)}"
+                                             process="@this" update="@form"/>
+                        </p:column>
+                    </p:dataTable>
+                </section>
+
+                <section class="card">
+                    <h2>Invoices</h2>
+                    <p:dataTable value="#{billingAdminView.invoices}" var="invoice"
+                                 emptyMessage="Generate an invoice for an account to see it here.">
+                        <p:column headerText="Period">#{invoice.periodKey}</p:column>
+
+                        <p:column headerText="Client">#{invoice.billingAccount.connection.owner.emailAddress}
+                        <br/>
+                        <small>#{invoice.billingAccount.connection.displayPhoneNumber}
+                        </small>
+                        </p:column>
+                        <p:column headerText="Chargeable messages">#{invoice.messageCount}</p:column>
+                        <p:column headerText="Meta estimate">#{invoice.billingAccount.currency} #{invoice.estimatedMetaCost}</p:column>
+                        <p:column headerText="Markup">#{invoice.billingAccount.currency} #{invoice.markupAmount}</p:column>
+                        <p:column headerText="Monthly fee">#{invoice.billingAccount.currency} #{invoice.monthlyFee}</p:column>
+                        <p:column headerText="Total"><strong>#{invoice.billingAccount.currency} #{invoice.totalAmount}</strong></p:column>
+
+                        <p:column headerText="Status">
+                        <span class="billing-status #{invoice.invoiceStatus eq 'PAID' ? 'paid' : 'open'}">#{invoice.invoiceStatus}
+                        </span>
+                        </p:column>
+                        <p:column headerText="Action">
+                            <p:commandButton rendered="#{invoice.invoiceStatus ne 'PAID'}"
+                                             value="Mark paid" icon="pi pi-check-circle"
+                                             actionListener="#{billingAdminView.paid(invoice)}"
+                                             process="@this" update="@form"/>
+                        </p:column>
+                    </p:dataTable>
+                </section>
+            </ui:fragment>
+        </h:form>
+    </ui:define>
+</ui:composition>
